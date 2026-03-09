@@ -1,0 +1,31 @@
+[
+  {
+    "id": "ord-abc12345",
+    "orderCode": "PD-20251101-101500-3x2-5x1",
+    "customerId": "guest-123abc",
+    "items": [
+      { "id": 3, "name": "Lâmpada LED A60", "quantity": 2, "price": 14.9 },
+      { "id": 5, "name": "Tomada Inteligente", "quantity": 1, "price": 79.9 }
+    ],
+    "paymentMethod": "pix",
+    "subtotal": 109.7,
+    "shipping": 15,
+    "total": 124.7,
+    "finalAmount": 112.23,
+    "createdAt": "2025-11-01T13:15:00.000Z"
+  },
+  {
+    "id": "ord-def67890",
+    "orderCode": "PD-20251105-164200-7x1",
+    "customerId": "guest-xyz789",
+    "items": [
+      { "id": 7, "name": "Extensão com botão", "quantity": 1, "price": 39.9 }
+    ],
+    "paymentMethod": "credit-card",
+    "subtotal": 39.9,
+    "shipping": 15,
+    "total": 54.9,
+    "finalAmount": 54.9,
+    "createdAt": "2025-11-05T19:42:00.000Z"
+  }
+]

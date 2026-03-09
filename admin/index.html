@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gerenciar Produtos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Painel Administrativo - Bulbe Shop</h1>
+            <p>Gerenciar Produtos</p>
+        </header>
+
+        <div class="admin-content">
+            <section class="product-form-section">
+                <h2>Adicionar/Editar Produto</h2>
+                <form id="product-form">
+                    <input type="hidden" id="product-id">
+                    
+                    <div class="form-group">
+                        <label for="product-name">Nome do Produto</label>
+                        <input type="text" id="product-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-description">Descrição</label>
+                        <textarea id="product-description" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-category">Categoria</label>
+                        <select id="product-category" required>
+                            <option value="">Selecione uma categoria</option>
+                            <option value="Eletrodomesticos eficientes">Eletrodomesticos eficientes</option>
+                            <option value="Economia de energia em casa">Economia de energia em casa</option>
+                            <option value="Dia a dia sustentável">Dia a dia sustentável</option>
+                            <option value="Conforto e bem-estar no lar">Conforto e bem-estar no lar</option>
+                            <option value="Tecnologia popular sustentavel">Tecnologia popular sustentavel</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-price">Preço Atual (R$)</label>
+                            <input type="number" id="product-price" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-old-price">Preço Antigo (R$)</label>
+                            <input type="number" id="product-old-price" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-discount">Desconto (%)</label>
+                            <input type="number" id="product-discount" min="0" max="100" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-rating">Avaliação</label>
+                            <input type="number" id="product-rating" min="0" max="5" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-rating-count">Número de Avaliações</label>
+                            <input type="number" id="product-rating-count" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-image">Imagem do Produto</label>
+                        <input type="file" id="product-image" accept="image/*">
+                        <small id="current-image" style="display: none; color: #08068D; margin-top: 4px;"></small>
+                        <div id="image-preview" style="display: none; margin-top: 12px;">
+                            <img id="preview-img" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #e0e0e0;">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Salvar Produto</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancelar</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="product-list-section">
+                <h2>Produtos Cadastrados</h2>
+                <div class="products-table-container">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Categoria</th>
+                                <th>Preço</th>
+                                <th>Desconto</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-list">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

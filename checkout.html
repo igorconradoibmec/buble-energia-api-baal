@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>checkout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="navbar-superior">
+            <button class="menu-btn" id="menu-btn" aria-label="Menu">
+                <img src="images/header_img/menu_sanduiche.png" alt="Menu">
+            </button>
+            <div class="sidebar-menu" id="sidebar-menu">
+                <div class="top-sidebar-menu">
+                    <h2 class="menu-h2">Menu</h2>
+                </div>
+                <div class="menu-links">
+                    <a href="cart.html" class="menu-link-item">Carrinho</a>
+                    <a href="catalog.html" class="menu-link-item">Catálogo</a>
+                    <a href="my-orders.html" class="menu-link-item">Meus pedidos</a>
+                    <a href="#" class="menu-link-item">Notificações</a>
+                    <a href="index.html" class="menu-link-item">Voltar para Bulbe</a>
+                </div>
+                <div class="menu-bottom-actions">
+                    <a href="mailto:contato@bulbeshop.com" class="menu-cta contact-link">Fale conosco</a>
+                    <button class="menu-cta settings-btn" type="button">Configurações</button>
+                </div>
+            </div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+            <a href="index.html" class="bulbeshop"><img src="images/header_img/logo.png" alt="Bulbe Shop" class="logo"></a>
+            <div class="profile-photo">
+                <img src="images/header_img/perfil.png" alt="Perfil" style="width: 200%; height: 200%; border-radius: 200px;">
+            </div>
+        </nav>
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar produtos" id="search-input">
+            <img src="images/header_img/lupa.png" alt="Buscar" class="search-icon">
+        </div>
+    </header>
+
+    <main class="container checkout-container">
+        <form class="checkout-form" id="checkout-form">
+            <section class="form-section">
+                <h2 class="section-title">Forma de pagamento</h2>
+                <p class="section-description">Preencha os dados e conclua sua compra</p>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Selecione a forma de pagamento
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="payment-method" value="credit-card" checked>
+                            <span>Cartão de crédito</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment-method" value="pix">
+                            <span>PIX</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment-method" value="boleto">
+                            <span>Boleto</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="card-fields">
+                    <div class="form-group">
+                        <label for="card-number" class="form-label">
+                            Número do Cartão
+                            <span class="help-icon" title="Ajuda">?</span>
+                        </label>
+                        <input type="text" id="card-number" aria-invalid="false" class="form-input" placeholder="0000 0000 0000 0000" pattern="[0-9]{16}" maxlength="19">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="card-expiry" class="form-label">
+                                Data de validade
+                                <span class="help-icon" title="Ajuda">?</span>
+                            </label>
+                            <input type="text" id="card-expiry" class="form-input" placeholder="MM/AA">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="card-cvv" class="form-label">
+                                Código de Segurança
+                                <span class="help-icon" title="Ajuda">?</span>
+                            </label>
+                            <input type="text" id="card-cvv" class="form-input" placeholder="123">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-name" class="form-label">
+                            Nome no Cartão
+                            <span class="help-icon" title="Ajuda">?</span>
+                        </label>
+                        <input type="text" id="card-name" class="form-input" placeholder="Nome como está no cartão">
+                    </div>
+                </div>
+
+                <div id="pix-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="pix-cpf" class="form-label">
+                            CPF
+                            <span class="help-icon" title="Ajuda">?</span>
+                        </label>
+                        <input type="text" id="pix-cpf" class="form-input" placeholder="000.000.000-00" maxlength="14">
+                    </div>
+                    <div class="pix-info">
+                        <p>Após confirmar o pedido, você receberá o QR Code PIX para pagamento.</p>
+                    </div>
+                </div>
+
+                <div id="boleto-fields" style="display: none;">
+                    <div class="boleto-info">
+                        <p>O boleto será gerado após a confirmação do pedido.</p>
+                        <p class="boleto-note">Prazo de vencimento: 3 dias úteis</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                        <label for="cupom-desconto" class="form-label">
+                             Cupom de Desconto
+                            <span class="help-icon" title="Ajuda">?</span>
+                        </label>
+
+                        <div class="row-cupom">
+                            <input type="text" id="cupom-desconto" class="form-input" placeholder="Insira seu Cupom">
+                            <button id="ok-cupom" type="button">Ok</button>
+                            <div class="feedback-cupom" id="feedback-positivo">Cupom aplicado com sucesso!</div>
+                            <div class="feedback-cupom" id="feedback-negativo">Cupom inválido ou já utilizado!</div>                           
+                        </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2 class="section-title">Dados de cobrança</h2>
+                
+                <div class="form-group">
+                    <label for="billing-name" class="form-label">
+                        Nome completo
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="text" id="billing-name" class="form-input" placeholder="Nome completo" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="billing-cep" class="form-label">
+                        Código Postal (CEP)
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <span class="error-message" id="billing-cep-error"></span>
+                    <input type="text" id="billing-cep" class="form-input" placeholder="00000-000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="billing-city" class="form-label">
+                        Cidade
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="text" id="billing-city" class="form-input" placeholder="Cidade" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="billing-address" class="form-label">
+                        Endereço
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="text" id="billing-address" class="form-input" placeholder="Logradouro" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="billing-number" class="form-label">
+                        Número
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="text" id="billing-number" class="form-input" placeholder="XXX" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="billing-complement" class="form-label">
+                        Complemento
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="text" id="billing-complement" class="form-input" placeholder="Apto, bloco, etc">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="save-billing-address">
+                        <span>Salvar endereço para próximas compras</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="billing-phone" class="form-label">
+                        Telefone
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="tel" id="billing-phone" class="form-input" placeholder="(XX) XXXXX-XXXX" data-mask="phone" required>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2 class="section-title">Entrega</h2>
+                
+                <div class="form-group">
+                    <label for="delivery-name" class="form-label">
+                        Nome completo
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="text" id="delivery-name" class="form-input" placeholder="Nome completo" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="delivery-cep" class="form-label">
+                        Código Postal (CEP)
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="text" id="delivery-cep" class="form-input" placeholder="XXXXX-XXX" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="delivery-city" class="form-label">
+                        Cidade
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="text" id="delivery-city" class="form-input" placeholder="Cidade" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="delivery-address" class="form-label">
+                        Endereço
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="text" id="delivery-address" class="form-input" placeholder="Logradouro" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="delivery-notes" class="form-label">
+                        Observações para entrega
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <textarea id="delivery-notes" class="form-input" placeholder="Informações adicionais para o entregador" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="delivery-number" class="form-label">
+                        Número
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="text" id="delivery-number" class="form-input" placeholder="XXX" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="delivery-phone" class="form-label">
+                        Telefone
+                        <span class="help-icon" title="Ajuda">?</span>
+                    </label>
+                    <input type="tel" id="delivery-phone" class="form-input" placeholder="(XX) XXXXX-XXXX" data-mask="phone" required>
+                </div>
+            </section>
+
+            <button type="submit" class="btn btn-primary submit-btn" id="submit-order-btn" data-validate="true">
+                Concluir Pedido
+            </button>
+        </form>
+    </main>
+
+    <script src="js/cart-utils.js"></script>
+    <script src="js/order-service.js"></script>
+    <script src="js/checkout.js"></script>
+    <script src="js/cupom.js"></script>
+    <script src="js/search-common.js"></script>
+    <script src="js/sandwich-menu.js"></script>
+</body>
+</html>

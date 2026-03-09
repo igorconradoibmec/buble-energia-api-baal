@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>search-results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/search-results.css">
+</head>
+<body class="has-bottom-nav">
+    <header class="site-header">
+        <nav class="navbar-superior">
+            <button class="menu-btn" id="menu-btn" aria-label="Menu">
+                <img src="images/header_img/menu_sanduiche.png" alt="Menu">
+            </button>
+            <div class="sidebar-menu" id="sidebar-menu">
+                <div class="top-sidebar-menu">
+                    <h2 class="menu-h2">Menu</h2>
+                </div>
+                <div class="menu-links">
+                    <a href="cart.html" class="menu-link-item">Carrinho</a>
+                    <a href="catalog.html" class="menu-link-item">Catálogo</a>
+                    <a href="my-orders.html" class="menu-link-item">Meus pedidos</a>
+                    <a href="#" class="menu-link-item">Notificações</a>
+                    <a href="index.html" class="menu-link-item">Voltar para Bulbe</a>
+                </div>
+                <div class="menu-bottom-actions">
+                    <a href="mailto:contato@bulbeshop.com" class="menu-cta contact-link">Fale conosco</a>
+                    <button class="menu-cta settings-btn" type="button">Configurações</button>
+                </div>
+            </div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+            <a href="index.html" class="bulbeshop"><img src="images/header_img/logo.png" alt="Bulbe Shop" class="logo"></a>
+            <div class="profile-photo">
+                <img src="images/header_img/perfil.png" alt="Perfil" style="width: 200%; height: 200%; border-radius: 200px;">
+            </div>
+        </nav>
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar produtos" id="search-input">
+            <img src="images/header_img/lupa.png" alt="Buscar" class="search-icon">
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1 class="page-title">Resultados da Pesquisa</h1>
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+                <a href="index.html">Início</a> › 
+                <span data-breadcrumb="current">Resultados da pesquisa</span>
+            </nav>
+            <button class="filter-btn" id="filter-btn">Filtros</button>
+        </div>
+
+        <section class="products-grid">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </section>
+    </main>
+
+    <div class="filter-modal" id="filter-modal" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="filter-modal__content">
+            <header class="filter-modal__header">
+                <h2 class="filter-modal__title">Filtrar produtos</h2>
+                <button type="button" class="filter-modal__close" id="filter-modal-close" aria-label="Fechar filtros">×</button>
+            </header>
+            <form class="filter-modal__form" id="filter-form">
+                <div class="filter-modal__section">
+                    <h3 class="filter-modal__section-title">Categorias</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="category" value="Eletrodomesticos eficientes">
+                            Eletrodomesticos eficientes
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="category" value="Economia de energia em casa">
+                            Economia de energia em casa
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="category" value="Dia a dia sustentável">
+                            Dia a dia sustentável
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="category" value="Conforto e bem-estar no lar">
+                            Conforto e bem-estar no lar
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="category" value="Tecnologia popular sustentavel">
+                            Tecnologia popular sustentavel
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-modal__section">
+                    <h3 class="filter-modal__section-title">Faixa de preço</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="radio" name="price-range" value="all" checked>
+                            Todos
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="price-range" value="0-100">
+                            Até R$100
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="price-range" value="100-300">
+                            R$100 - R$300
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="price-range" value="300-999">
+                            Acima de R$300
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-modal__section">
+                    <h3 class="filter-modal__section-title">Avaliação mínima</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="radio" name="rating" value="4">
+                            4★ ou mais
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="rating" value="3">
+                            3★ ou mais
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="rating" value="2">
+                            2★ ou mais
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-modal__section">
+                    <h3 class="filter-modal__section-title">Ordenar por</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="radio" name="sort" value="popularidade" checked>
+                            Popularidade
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="sort" value="menor-preco">
+                            Menor preço
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="sort" value="maior-preco">
+                            Maior preço
+                        </label>
+                    </div>
+                </div>
+            </form>
+            <div class="filter-modal__actions">
+                <button type="button" class="btn-secondary filter-clear-btn" id="filter-clear-btn">Limpar</button>
+                <button type="button" class="btn-primary filter-apply-btn" id="filter-apply-btn">Aplicar</button>
+            </div>
+        </div>
+    </div>
+    <div class="filter-modal-overlay" id="filter-modal-overlay" aria-hidden="true"></div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <img src="images/footer_img/home-ativado.png" alt="Início" class="nav-icon active-icon">
+            <img src="images/footer_img/home-desativado.png" alt="Início" class="nav-icon inactive-icon">
+            <span class="nav-label">Início</span>
+        </a>
+        <a href="catalog.html" class="nav-item active">
+            <img src="images/footer_img/catalogo-ativado.png" alt="Catálogo" class="nav-icon active-icon">
+            <img src="images/footer_img/catalogo-desativado.png" alt="Catálogo" class="nav-icon inactive-icon">
+            <span class="nav-label">Catálogo</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <img src="images/footer_img/carrinho-ativado.png" alt="Carrinho" class="nav-icon active-icon">
+            <img src="images/footer_img/carrinho-desativado.png" alt="Carrinho" class="nav-icon inactive-icon">
+            <span class="nav-label">Carrinho</span>
+        </a>
+    </nav>
+
+    <script src="js/utils.js"></script>
+    <script src="js/search-common.js"></script>
+    <script src="js/filter-modal.js"></script>
+    <script src="js/search-results.js"></script>
+    <script src="js/sandwich-menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+.black-friday-page {
+    background: #FFFBE6;
+}
+
+.black-friday-page .page-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.black-friday-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.black-friday-eyebrow {
+    font-family: 'Poppins';
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: #1C1C1C;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.black-friday-page .page-title {
+    font-family: 'Poppins';
+    font-size: 24px;
+    font-weight: 600;
+    color: #0D0D0D;
+    margin: 0;
+}
+
+.black-friday-page .filter-btn {
+    background: #FFF4B3;
+    color: #1C1C1C;
+    border: 1px solid rgba(17, 17, 17, 0.15);
+}
+
+.black-friday-page .breadcrumbs {
+    margin-bottom: 24px;
+    color: #4E3F15;
+}
+
+.black-friday-page .breadcrumbs a {
+    color: #E0B700;
+}
+
+.black-friday-page .products-grid {
+    gap: 16px;
+}
+
+.product-card--black-friday {
+    background: linear-gradient(180deg, #FFFBE6 0%, #FFFFFF 100%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0px 20px 40px rgba(15, 15, 15, 0.15);
+    position: relative;
+}
+
+.product-card--black-friday::before {
+    content: 'Black Friday';
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: #111111;
+    color: #FFD74A;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    padding: 4px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+}
+
+.black-friday-page .discount-tag,
+.product-card--black-friday .discount-tag {
+    background: #111111;
+    color: #FFD74A;
+    box-shadow: 0 4px 15px rgba(28, 28, 28, 0.15);
+}
+
+.black-friday-page .price-currency,
+.black-friday-page .price-value,
+.product-card--black-friday .price-currency,
+.product-card--black-friday .price-value {
+    color: #D4A100;
+}
+
+.black-friday-page .no-products {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 12px;
+    font-family: 'Poppins';
+    font-weight: 500;
+    color: #4E3F15;
+}

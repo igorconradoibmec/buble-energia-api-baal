@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/catalog.css">
+</head>
+<body class="has-bottom-nav">
+    <header class="site-header">
+        <nav class="navbar-superior">
+            <button class="menu-btn" id="menu-btn" aria-label="Menu">
+                <img src="images/header_img/menu_sanduiche.png" alt="Menu">
+            </button>
+            <div class="sidebar-menu" id="sidebar-menu">
+                <div class="top-sidebar-menu">
+                    <h2 class="menu-h2">Menu</h2>
+                </div>
+                <div class="menu-links">
+                    <a href="cart.html" class="menu-link-item">Carrinho</a>
+                    <a href="catalog.html" class="menu-link-item">Catálogo</a>
+                    <a href="my-orders.html" class="menu-link-item">Meus pedidos</a>
+                    <a href="#" class="menu-link-item">Notificações</a>
+                    <a href="index.html" class="menu-link-item">Voltar para Bulbe</a>
+                </div>
+                <div class="menu-bottom-actions">
+                    <a href="mailto:contato@bulbeshop.com" class="menu-cta contact-link">Fale conosco</a>
+                    <button class="menu-cta settings-btn" type="button">Configurações</button>
+                </div>
+            </div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+            <a href="index.html" class="bulbeshop"><img src="images/header_img/logo.png" alt="Bulbe Shop" class="logo"></a>
+            <div class="profile-photo">
+                <img src="images/header_img/perfil.png" alt="Perfil" style="width: 200%; height: 200%; border-radius: 200px;">
+            </div>
+        </nav>
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar produtos" id="search-input">
+            <img src="images/header_img/lupa.png" alt="Buscar" class="search-icon">
+        </div>
+    </header>
+    <main class="container">
+        <section class="category-banners">
+            <a href="product-list.html?category=Eletrodomesticos%20eficientes" class="category-banner">
+                <img src="images/catalogo_banner_img/eletrodomesticos.png" alt="Eletrodomesticos eficientes" class="banner-image">
+                <h2 class="banner-title"> </h2>
+            </a>
+            
+            <a href="product-list.html?category=Economia%20de%20energia%20em%20casa" class="category-banner">
+                <img src="images/catalogo_banner_img/economia.png" alt="Economia de energia em casa" class="banner-image">
+                <h2 class="banner-title"> </h2>
+            </a>
+            
+            <a href="product-list.html?category=Dia%20a%20dia%20sustent%C3%A1vel" class="category-banner">
+                <img src="images/catalogo_banner_img/dia a dia.png" alt="Dia a dia sustentável" class="banner-image">
+                <h2 class="banner-title"> </h2>
+            </a>
+            
+            <a href="product-list.html?category=Conforto%20e%20bem-estar%20no%20lar" class="category-banner">
+                <img src="images/catalogo_banner_img/conforto.png" alt="Conforto e bem-estar no lar" class="banner-image">
+                <h2 class="banner-title"> </h2>
+            </a>
+            
+            <a href="product-list.html?category=Tecnologia%20popular%20sustentavel" class="category-banner">
+                <img src="images/catalogo_banner_img/tecnologia.png" alt="Tecnologia popular sustentavel" class="banner-image">
+                <h2 class="banner-title"> </h2>
+            </a>
+        </section>
+    </main>
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <img src="images/footer_img/home-ativado.png" alt="Início" class="nav-icon active-icon">
+            <img src="images/footer_img/home-desativado.png" alt="Início" class="nav-icon inactive-icon">
+            <span class="nav-label">Início</span>
+        </a>
+        <a href="catalog.html" class="nav-item active">
+            <img src="images/footer_img/catalogo-ativado.png" alt="Catálogo" class="nav-icon active-icon">
+            <img src="images/footer_img/catalogo-desativado.png" alt="Catálogo" class="nav-icon inactive-icon">
+            <span class="nav-label">Catálogo</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <img src="images/footer_img/carrinho-ativado.png" alt="Carrinho" class="nav-icon active-icon">
+            <img src="images/footer_img/carrinho-desativado.png" alt="Carrinho" class="nav-icon inactive-icon">
+            <span class="nav-label">Carrinho</span>
+        </a>
+    </nav>
+    <script src="js/search-common.js"></script>
+    <script src="js/catalog.js"></script>
+    <script src="js/sandwich-menu.js"></script>
+</body>
+</html>
