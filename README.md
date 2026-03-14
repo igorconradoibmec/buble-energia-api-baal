@@ -20,7 +20,7 @@ Projeto desenvolvido para a disciplina de Projeto de Desenvolvimento Backend —
 | Igor Conrado Figueiredo Almeida | 202501008411 | [@igorconradoibmec](https://github.com/igorconradoibmec) |
 | Marcelo Benvindo Guimarães Reis | 202501006361 | [@marceloxreis](https://github.com/marceloxreis) |
 | Joshua Azze Distel | 202501007181 | [@joshazze](https://github.com/joshazze) |
-| Felipe Cota | — | — |
+| Felipe de Miranda Cota Callado | 202301170711 | [@felipecota04](https://github.com/felipecota04) |
 
 ---
 
