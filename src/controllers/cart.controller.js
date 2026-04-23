@@ -19,4 +19,18 @@ function updateItemQuantity(req, res) {
     res.status(200).json({ message: 'Quantidade atualizada', cart });
 }
 
-module.exports = { updateItemQuantity };
+function removeItem(req, res) {
+    const itemId = Number(req.params.itemId);
+    if (!Number.isInteger(itemId) || itemId <= 0) {
+        return res.status(404).json({ error: 'Item nao encontrado no carrinho' });
+    }
+
+    const cart = cartService.removeItem(req.userId, itemId);
+    if (!cart) {
+        return res.status(404).json({ error: 'Item nao encontrado no carrinho' });
+    }
+
+    res.status(200).json({ message: 'Item removido do carrinho', cart });
+}
+
+module.exports = { updateItemQuantity, removeItem };
