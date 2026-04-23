@@ -31,4 +31,19 @@ function searchProducts(query) {
     });
 }
 
-module.exports = { listProducts, getProductById, searchProducts };
+function isAlexaProduct(p) {
+    const text = `${p.name || ''} ${p.description || ''} ${p.category || ''}`.toLowerCase();
+    return text.includes('alexa') || text.includes('echo');
+}
+
+function getFeaturedProducts({ limit = 8, alexaMinimum = 2 } = {}) {
+    const all = loadProducts();
+    const alexa = all.filter(isAlexaProduct);
+    const nonAlexa = all.filter((p) => !isAlexaProduct(p));
+
+    const guaranteed = alexa.slice(0, alexaMinimum);
+    const fillers = [...alexa.slice(alexaMinimum), ...nonAlexa].slice(0, limit - guaranteed.length);
+    return [...guaranteed, ...fillers];
+}
+
+module.exports = { listProducts, getProductById, searchProducts, getFeaturedProducts };

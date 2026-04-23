@@ -24,4 +24,9 @@ function searchProducts(req, res) {
     res.status(200).json({ query: q, results, total: results.length });
 }
 
-module.exports = { listProducts, getProductById, searchProducts };
+function getFeaturedProducts(req, res) {
+    const products = productsService.getFeaturedProducts();
+    res.status(200).json({ products, total: products.length });
+}
+
+module.exports = { listProducts, getProductById, searchProducts, getFeaturedProducts };
