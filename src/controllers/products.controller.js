@@ -6,4 +6,16 @@ function listProducts(req, res) {
     res.status(200).json({ products, total: products.length });
 }
 
-module.exports = { listProducts };
+function getProductById(req, res) {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+        return res.status(404).json({ error: 'Produto nao encontrado' });
+    }
+    const product = productsService.getProductById(id);
+    if (!product) {
+        return res.status(404).json({ error: 'Produto nao encontrado' });
+    }
+    res.status(200).json(product);
+}
+
+module.exports = { listProducts, getProductById };
