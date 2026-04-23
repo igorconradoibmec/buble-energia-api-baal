@@ -20,4 +20,15 @@ function getProductById(id) {
     return all.find((p) => p.id === id) || null;
 }
 
-module.exports = { listProducts, getProductById };
+function searchProducts(query) {
+    if (!query) return [];
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return [];
+    const all = loadProducts();
+    return all.filter((p) => {
+        const fields = [p.name, p.description, p.category];
+        return fields.some((f) => typeof f === 'string' && f.toLowerCase().includes(normalized));
+    });
+}
+
+module.exports = { listProducts, getProductById, searchProducts };

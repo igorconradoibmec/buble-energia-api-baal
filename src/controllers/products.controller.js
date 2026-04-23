@@ -18,4 +18,10 @@ function getProductById(req, res) {
     res.status(200).json(product);
 }
 
-module.exports = { listProducts, getProductById };
+function searchProducts(req, res) {
+    const q = typeof req.query.q === 'string' ? req.query.q : '';
+    const results = productsService.searchProducts(q);
+    res.status(200).json({ query: q, results, total: results.length });
+}
+
+module.exports = { listProducts, getProductById, searchProducts };
