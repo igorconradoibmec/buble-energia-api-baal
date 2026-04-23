@@ -33,4 +33,9 @@ function removeItem(req, res) {
     res.status(200).json({ message: 'Item removido do carrinho', cart });
 }
 
-module.exports = { updateItemQuantity, removeItem };
+function clearCart(req, res) {
+    const cart = cartService.clearCart(req.userId);
+    res.status(200).json({ message: 'Carrinho limpo', cart });
+}
+
+module.exports = { updateItemQuantity, removeItem, clearCart };
