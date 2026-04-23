@@ -28,4 +28,9 @@ function removeItem(userId, itemId) {
     return summarize(items);
 }
 
-module.exports = { getCart, updateItemQuantity, removeItem };
+function clearCart(userId) {
+    cartRepository.setByUserId(userId, []);
+    return summarize([]);
+}
+
+module.exports = { getCart, updateItemQuantity, removeItem, clearCart };
