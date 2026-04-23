@@ -5,5 +5,6 @@ const { requireAuth } = require('../middlewares/auth.middleware');
 const router = express.Router();
 
 router.put('/items/:itemId', requireAuth, cartController.updateItemQuantity);
+router.delete('/items/:itemId', requireAuth, cartController.removeItem);
 
 module.exports = router;
