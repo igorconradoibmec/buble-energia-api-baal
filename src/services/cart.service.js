@@ -19,4 +19,13 @@ function updateItemQuantity(userId, itemId, quantity) {
     return summarize(items);
 }
 
-module.exports = { getCart, updateItemQuantity };
+function removeItem(userId, itemId) {
+    const items = cartRepository.getByUserId(userId);
+    const index = items.findIndex((it) => it.id === itemId);
+    if (index === -1) return null;
+    items.splice(index, 1);
+    cartRepository.setByUserId(userId, items);
+    return summarize(items);
+}
+
+module.exports = { getCart, updateItemQuantity, removeItem };
