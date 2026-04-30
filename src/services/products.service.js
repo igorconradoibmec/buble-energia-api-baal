@@ -15,4 +15,9 @@ function listProducts({ category } = {}) {
     return all.filter((p) => p.category && p.category.toLowerCase() === normalized);
 }
 
-module.exports = { listProducts };
+function getProductById(id) {
+    const all = loadProducts();
+    return all.find((p) => p.id === id) || null;
+}
+
+module.exports = { listProducts, getProductById };
