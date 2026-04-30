@@ -1,0 +1,14 @@
+{
+  "name": "bulbe-energia-api",
+  "version": "0.1.0",
+  "description": "Backend da Bulbe Energia",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
