@@ -27,6 +27,8 @@ tags:
     description: Finalização de compra
   - name: Customers
     description: Dados e pedidos do cliente
+  - name: Coupons
+    description: Validação de cupons de desconto
 
 paths:
   /products:
@@ -251,6 +253,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /coupons/validate:
+    post:
+      tags: [Coupons]
+      summary: Valida um cupom de desconto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+                  example: BULBE10
+      responses:
+        '200':
+          description: Resultado da validação (válido ou inválido)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [valid, message]
+                properties:
+                  valid:
+                    type: boolean
+                  code:
+                    type: string
+                    example: BULBE10
+                  discountPercentage:
+                    type: number
+                    format: float
+                    description: Presente apenas quando valid=true
+                    example: 0.10
+                  message:
+                    type: string
+                    example: Cupom aplicado com sucesso! Desconto de 10%
 
   /customers/{customerId}/orders:
     get:
