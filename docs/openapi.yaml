@@ -1,0 +1,553 @@
+openapi: 3.0.3
+info:
+  title: Bulbe Energia API
+  version: 0.1.0
+  description: |
+    Backend da loja Bulbe Energia.
+
+    Catálogo de produtos, carrinho e checkout. Persistência em arquivos JSON
+    (`src/data/`) — projeto acadêmico.
+
+    ## Autenticação
+
+    Endpoints de carrinho e pedido exigem header `Authorization: Bearer <token>`.
+    O middleware (`src/middlewares/auth.middleware.js`) trata qualquer string não vazia
+    como `userId` — útil para isolar carrinhos por usuário sem implementar JWT.
+
+servers:
+  - url: /api/v1
+    description: Base da API
+
+tags:
+  - name: Products
+    description: Catálogo de produtos
+  - name: Cart
+    description: Carrinho do usuário (autenticado)
+  - name: Orders
+    description: Finalização de compra
+
+paths:
+  /products:
+    get:
+      tags: [Products]
+      summary: Lista produtos do catálogo
+      description: |
+        Retorna todos os produtos. Aceita filtro opcional por categoria
+        (case-insensitive, comparação exata após `trim().toLowerCase()`).
+      parameters:
+        - in: query
+          name: category
+          required: false
+          schema:
+            type: string
+          example: "Conforto e bem-estar no lar"
+      responses:
+        '200':
+          description: Lista de produtos
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [products, total]
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  total:
+                    type: integer
+                    example: 42
+
+  /products/search:
+    get:
+      tags: [Products]
+      summary: Busca produtos por texto livre
+      description: |
+        Busca case-insensitive em `name`, `description` e `category`.
+        Query vazia retorna lista vazia (não retorna todos).
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+          example: alexa
+      responses:
+        '200':
+          description: Resultados da busca
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [query, results, total]
+                properties:
+                  query:
+                    type: string
+                    example: alexa
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  total:
+                    type: integer
+
+  /products/featured:
+    get:
+      tags: [Products]
+      summary: Produtos em destaque
+      description: |
+        Retorna até 8 produtos em destaque, garantindo no mínimo 2 produtos
+        Alexa (matched por `alexa` ou `echo` em name/description/category)
+        no início da lista.
+      responses:
+        '200':
+          description: Produtos em destaque
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [products, total]
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  total:
+                    type: integer
+                    example: 8
+
+  /products/{id}:
+    get:
+      tags: [Products]
+      summary: Busca produto por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          example: 1
+      responses:
+        '200':
+          description: Produto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Produto não existe ou ID inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart:
+    delete:
+      tags: [Cart]
+      summary: Limpa o carrinho do usuário
+      description: Remove todos os itens do carrinho. Idempotente — sucesso mesmo se já estava vazio.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Carrinho limpo
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message, cart]
+                properties:
+                  message:
+                    type: string
+                    example: Carrinho limpo
+                  cart:
+                    $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /cart/items/{itemId}:
+    parameters:
+      - in: path
+        name: itemId
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: ID do item no carrinho (mesmo ID do produto)
+        example: 1
+    put:
+      tags: [Cart]
+      summary: Atualiza quantidade de um item
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity:
+                  type: integer
+                  minimum: 1
+                  maximum: 99
+                  example: 3
+      responses:
+        '200':
+          description: Quantidade atualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message, cart]
+                properties:
+                  message:
+                    type: string
+                    example: Quantidade atualizada
+                  cart:
+                    $ref: '#/components/schemas/Cart'
+        '400':
+          description: Quantidade inválida (fora do range 1-99 ou não-inteiro)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Item não está no carrinho
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [Cart]
+      summary: Remove um item do carrinho
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Item removido
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message, cart]
+                properties:
+                  message:
+                    type: string
+                    example: Item removido do carrinho
+                  cart:
+                    $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Item não está no carrinho
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders:
+    post:
+      tags: [Orders]
+      summary: Finaliza uma compra
+      description: |
+        Cria um pedido a partir do payload. Regras de desconto:
+
+        - Pagamento `pix` → 10% de desconto automático
+        - `couponCode` válido → desconto adicional do cupom (se ambos, somam-se sobre o subtotal)
+        - Cupons válidos: `BULBE10` (10%), `BULBE15` (15%), `BULBE20` (20%),
+          `BLACKFRIDAY` (20%), `WELCOME5` (5%), `PROMO25` (25%), `SUPERPROMO` (40%)
+
+        `orderCode` segue o formato `PD-YYYYMMDD-HHMMSS-{firstItemId}x{firstItemQty}`.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '201':
+          description: Pedido criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Body inválido (ver mensagem)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                bodyInvalido:
+                  value: { error: "Body invalido" }
+                semItens:
+                  value: { error: "Items obrigatorio" }
+                pagamento:
+                  value: { error: "Metodo de pagamento invalido" }
+                cupom:
+                  value: { error: "Cupom invalido" }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Qualquer string não vazia é tratada como `userId`. Não é JWT.
+
+  responses:
+    Unauthorized:
+      description: Token Bearer ausente ou malformado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example: { error: "Nao autenticado" }
+
+  schemas:
+    Product:
+      type: object
+      required: [id, name, price]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Echo Dot 5ª Geração
+        description:
+          type: string
+          example: O Echo Dot com o melhor som já lançado Cor Preta.
+        category:
+          type: string
+          example: Conforto e bem-estar no lar
+        price:
+          type: number
+          format: float
+          example: 398.99
+        oldPrice:
+          type: number
+          format: float
+          example: 459
+        discount:
+          type: integer
+          description: Percentual de desconto em relação ao oldPrice
+          example: 13
+        rating:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 5
+          example: 5
+        ratingCount:
+          type: integer
+          example: 439
+        image:
+          type: string
+          example: images/produtos/echoDot.jpg
+
+    CartItem:
+      type: object
+      required: [id, quantity, price]
+      properties:
+        id:
+          type: integer
+          description: Mesmo ID do produto
+          example: 1
+        name:
+          type: string
+          example: Echo Dot 5ª Geração
+        price:
+          type: number
+          format: float
+          example: 398.99
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 99
+          example: 2
+        image:
+          type: string
+          example: images/produtos/echoDot.jpg
+
+    Cart:
+      type: object
+      required: [items, itemCount, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+        itemCount:
+          type: integer
+          description: Soma de quantity de todos os items
+          example: 3
+        total:
+          type: number
+          format: float
+          description: Soma de price * quantity (2 casas decimais)
+          example: 1196.97
+
+    Address:
+      type: object
+      required: [zip, street, number, city, state]
+      properties:
+        zip:
+          type: string
+          example: "30130-100"
+        street:
+          type: string
+          example: Av. Afonso Pena
+        number:
+          type: string
+          example: "1500"
+        complement:
+          type: string
+          example: Apt 502
+        neighborhood:
+          type: string
+          example: Centro
+        city:
+          type: string
+          example: Belo Horizonte
+        state:
+          type: string
+          example: MG
+
+    Customer:
+      type: object
+      required: [name, email]
+      properties:
+        name:
+          type: string
+          example: Joshua Azze
+        email:
+          type: string
+          format: email
+          example: jazzedistel@gmail.com
+        phone:
+          type: string
+          example: "(31) 99999-9999"
+        cpf:
+          type: string
+          example: "000.000.000-00"
+
+    OrderRequest:
+      type: object
+      required: [items, paymentMethod, shipping, customer, billingAddress, deliveryAddress]
+      properties:
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [id, quantity, price]
+            properties:
+              id:
+                type: integer
+                minimum: 1
+              quantity:
+                type: integer
+                minimum: 1
+              price:
+                type: number
+                format: float
+                minimum: 0
+        paymentMethod:
+          type: string
+          enum: [credit-card, pix, boleto]
+        shipping:
+          type: number
+          format: float
+          minimum: 0
+        customer:
+          $ref: '#/components/schemas/Customer'
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        deliveryAddress:
+          $ref: '#/components/schemas/Address'
+        couponCode:
+          type: string
+          nullable: true
+          description: Código do cupom (case-insensitive, normalizado pra UPPERCASE)
+          example: BULBE10
+
+    Order:
+      type: object
+      required: [id, orderCode, customerId, items, paymentMethod, subtotal, shipping, total, finalAmount, createdAt]
+      properties:
+        id:
+          type: string
+          example: ord-3f9a1b2c
+        orderCode:
+          type: string
+          description: Formato `PD-YYYYMMDD-HHMMSS-{firstItemId}x{firstItemQty}`
+          example: PD-20260504-184230-1x2
+        customerId:
+          type: string
+          description: userId do Bearer token
+          example: user-123
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              quantity: { type: integer }
+              price: { type: number, format: float }
+        paymentMethod:
+          type: string
+          enum: [credit-card, pix, boleto]
+        customer:
+          $ref: '#/components/schemas/Customer'
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        deliveryAddress:
+          $ref: '#/components/schemas/Address'
+        couponCode:
+          type: string
+          nullable: true
+        subtotal:
+          type: number
+          format: float
+          description: Soma de price * quantity dos items (sem frete, sem desconto)
+        shipping:
+          type: number
+          format: float
+        couponDiscount:
+          type: number
+          format: float
+          description: Fração de desconto do cupom (ex 0.10 = 10%)
+          example: 0.10
+        pixDiscount:
+          type: number
+          format: float
+          description: 0.10 se paymentMethod=pix, senão 0
+          example: 0.10
+        total:
+          type: number
+          format: float
+          description: subtotal + shipping (antes dos descontos)
+        finalAmount:
+          type: number
+          format: float
+          description: subtotal - (subtotal * (couponDiscount + pixDiscount)) + shipping
+        createdAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          example: Mensagem de erro
