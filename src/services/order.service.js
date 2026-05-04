@@ -76,4 +76,10 @@ function getOrderById(orderId) {
     return { order };
 }
 
-module.exports = { createOrder, getOrderById };
+function getOrdersByCustomerId(customerId) {
+    if (!customerId || typeof customerId !== 'string') return { error: 'ID do cliente invalido' };
+    const orders = orderRepository.findByCustomerId(customerId);
+    return { orders, total: orders.length };
+}
+
+module.exports = { createOrder, getOrderById, getOrdersByCustomerId };

@@ -24,4 +24,8 @@ function findById(orderId) {
     return loadAll().find((o) => o.id === orderId) || null;
 }
 
-module.exports = { insert, findById };
+function findByCustomerId(customerId) {
+    return loadAll().filter((o) => o.customerId === customerId);
+}
+
+module.exports = { insert, findById, findByCustomerId };
