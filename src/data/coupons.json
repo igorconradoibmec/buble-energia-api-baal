@@ -1,0 +1,12 @@
+[
+  { "code": "BULBE10", "discount": 0.10 },
+  { "code": "BULBE15", "discount": 0.15 },
+  { "code": "BULBE20", "discount": 0.20 },
+  { "code": "BLACKFRIDAY", "discount": 0.20 },
+  { "code": "WELCOME5", "discount": 0.05 },
+  { "code": "PROMO25", "discount": 0.25 },
+  { "code": "SUPERPROMO", "discount": 0.40 },
+  { "code": "SUPER30", "discount": 0.30 },
+  { "code": "CLIENTEVIP", "discount": 0.12 },
+  { "code": "MEGASALE", "discount": 0.18 }
+]
