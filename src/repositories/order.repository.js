@@ -20,4 +20,8 @@ function insert(order) {
     return order;
 }
 
-module.exports = { insert };
+function findById(orderId) {
+    return loadAll().find((o) => o.id === orderId) || null;
+}
+
+module.exports = { insert, findById };
