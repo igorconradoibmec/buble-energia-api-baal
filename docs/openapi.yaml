@@ -29,6 +29,8 @@ tags:
     description: Dados e pedidos do cliente
   - name: Coupons
     description: Validação de cupons de desconto
+  - name: Users
+    description: Sessão de usuário
 
 paths:
   /products:
@@ -253,6 +255,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    post:
+      tags: [Users]
+      summary: Cria uma sessão de usuário guest
+      description: |
+        Gera um ID de usuário anônimo (`guest-XXXXXX`) e retorna o token
+        a ser usado como Bearer nas rotas autenticadas.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Sessão criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [userId, token, createdAt]
+                properties:
+                  userId:
+                    type: string
+                    example: guest-a1b2c3
+                  token:
+                    type: string
+                    description: Mesmo valor que userId — usar como Bearer token
+                    example: guest-a1b2c3
+                  createdAt:
+                    type: string
+                    format: date-time
 
   /coupons/validate:
     post:
