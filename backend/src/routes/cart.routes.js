@@ -4,6 +4,7 @@ const { requireAuth } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
+router.get('/', requireAuth, cartController.getCart);
 router.put('/items/:itemId', requireAuth, cartController.updateItemQuantity);
 router.delete('/items/:itemId', requireAuth, cartController.removeItem);
 router.delete('/', requireAuth, cartController.clearCart);
