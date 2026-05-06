@@ -69,4 +69,17 @@ function createOrder(userId, body) {
     return { order };
 }
 
-module.exports = { createOrder };
+function getOrderById(orderId) {
+    if (!orderId || typeof orderId !== 'string') return { error: 'ID do pedido invalido' };
+    const order = orderRepository.findById(orderId);
+    if (!order) return { error: 'Pedido nao encontrado' };
+    return { order };
+}
+
+function getOrdersByCustomerId(customerId) {
+    if (!customerId || typeof customerId !== 'string') return { error: 'ID do cliente invalido' };
+    const orders = orderRepository.findByCustomerId(customerId);
+    return { orders, total: orders.length };
+}
+
+module.exports = { createOrder, getOrderById, getOrdersByCustomerId };

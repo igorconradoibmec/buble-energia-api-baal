@@ -25,6 +25,12 @@ tags:
     description: Carrinho do usuário (autenticado)
   - name: Orders
     description: Finalização de compra
+  - name: Customers
+    description: Dados e pedidos do cliente
+  - name: Coupons
+    description: Validação de cupons de desconto
+  - name: Users
+    description: Sessão de usuário
 
 paths:
   /products:
@@ -249,6 +255,138 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    post:
+      tags: [Users]
+      summary: Cria uma sessão de usuário guest
+      description: |
+        Gera um ID de usuário anônimo (`guest-XXXXXX`) e retorna o token
+        a ser usado como Bearer nas rotas autenticadas.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Sessão criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [userId, token, createdAt]
+                properties:
+                  userId:
+                    type: string
+                    example: guest-a1b2c3
+                  token:
+                    type: string
+                    description: Mesmo valor que userId — usar como Bearer token
+                    example: guest-a1b2c3
+                  createdAt:
+                    type: string
+                    format: date-time
+
+  /coupons/validate:
+    post:
+      tags: [Coupons]
+      summary: Valida um cupom de desconto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+                  example: BULBE10
+      responses:
+        '200':
+          description: Resultado da validação (válido ou inválido)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [valid, message]
+                properties:
+                  valid:
+                    type: boolean
+                  code:
+                    type: string
+                    example: BULBE10
+                  discountPercentage:
+                    type: number
+                    format: float
+                    description: Presente apenas quando valid=true
+                    example: 0.10
+                  message:
+                    type: string
+                    example: Cupom aplicado com sucesso! Desconto de 10%
+
+  /customers/{customerId}/orders:
+    get:
+      tags: [Customers]
+      summary: Lista pedidos do usuário
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: customerId
+          required: true
+          schema:
+            type: string
+          example: guest-a1b2c3
+      responses:
+        '200':
+          description: Lista de pedidos do cliente
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [orders, total]
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  total:
+                    type: integer
+                    example: 3
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /orders/{orderId}:
+    get:
+      tags: [Orders]
+      summary: Busca detalhes de um pedido
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+          example: ord-3f9a1b2c
+      responses:
+        '200':
+          description: Pedido encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Pedido não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
   /orders:
     post:

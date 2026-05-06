@@ -20,4 +20,12 @@ function insert(order) {
     return order;
 }
 
-module.exports = { insert };
+function findById(orderId) {
+    return loadAll().find((o) => o.id === orderId) || null;
+}
+
+function findByCustomerId(customerId) {
+    return loadAll().filter((o) => o.customerId === customerId);
+}
+
+module.exports = { insert, findById, findByCustomerId };
