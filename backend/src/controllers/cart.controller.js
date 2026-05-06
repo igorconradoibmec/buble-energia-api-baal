@@ -1,5 +1,28 @@
 const cartService = require('../services/cart.service');
 
+function getCart(req, res) {
+    const cart = cartService.getCart(req.userId);
+    res.status(200).json(cart);
+}
+
+function addItem(req, res) {
+    const { productId, quantity } = req.body || {};
+
+    if (!Number.isInteger(productId) || productId <= 0) {
+        return res.status(400).json({ error: 'productId invalido' });
+    }
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+        return res.status(400).json({ error: 'quantity invalida (minimo 1, maximo 99)' });
+    }
+
+    const result = cartService.addItem(req.userId, productId, quantity);
+    if (!result) {
+        return res.status(400).json({ error: 'Produto nao encontrado' });
+    }
+
+    res.status(201).json({ message: 'Item adicionado ao carrinho', cart: result });
+}
+
 function updateItemQuantity(req, res) {
     const itemId = Number(req.params.itemId);
     const { quantity } = req.body || {};
@@ -38,4 +61,4 @@ function clearCart(req, res) {
     res.status(200).json({ message: 'Carrinho limpo', cart });
 }
 
-module.exports = { updateItemQuantity, removeItem, clearCart };
+module.exports = { getCart, addItem, updateItemQuantity, removeItem, clearCart };

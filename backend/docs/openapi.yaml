@@ -122,6 +122,103 @@ paths:
                     type: integer
                     example: 8
 
+  /products/black-friday:
+    get:
+      tags: [Products]
+      summary: Produtos da campanha Black Friday
+      description: |
+        Retorna os produtos selecionados para a campanha Black Friday.
+        Suporta filtros opcionais por categoria, faixa de preço e avaliação mínima.
+      parameters:
+        - in: query
+          name: category
+          required: false
+          schema:
+            type: string
+          example: Conforto
+        - in: query
+          name: priceRange
+          required: false
+          schema:
+            type: string
+            enum: [all, 0-50, 50-100, 100-300, 300-999]
+          example: 300-999
+        - in: query
+          name: minRating
+          required: false
+          schema:
+            type: number
+            minimum: 0
+            maximum: 5
+          example: 4
+      responses:
+        '200':
+          description: Produtos da campanha Black Friday filtrados
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [products, filters, total]
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  filters:
+                    type: object
+                    required: [categories, priceRanges]
+                    properties:
+                      categories:
+                        type: array
+                        items:
+                          type: string
+                      priceRanges:
+                        type: array
+                        items:
+                          type: string
+                          enum: [0-50, 50-100, 100-300, 300-999]
+                  total:
+                    type: integer
+                    example: 4
+        '400':
+          description: priceRange inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/recommendations:
+    get:
+      tags: [Products]
+      summary: Recomendações de produtos baseadas no carrinho
+      description: |
+        Recebe IDs dos itens do carrinho e retorna até 10 produtos por categoria
+        compartilhada com os itens, excluindo os que já estão no carrinho.
+      parameters:
+        - in: query
+          name: cartItemIds
+          required: false
+          description: Lista de IDs separados por vírgula (ex `1,3,5`)
+          schema:
+            type: string
+          example: "1,3,5"
+      responses:
+        '200':
+          description: Lista de produtos recomendados
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [recommendations, total]
+                properties:
+                  recommendations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  total:
+                    type: integer
+                    example: 7
+
   /products/{id}:
     get:
       tags: [Products]
@@ -149,6 +246,23 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
   /cart:
+    get:
+      tags: [Cart]
+      summary: Obtém o carrinho do usuário autenticado
+      description: |
+        Retorna os itens do carrinho do usuário, com `itemCount` e `total` calculados.
+        Carrinho vazio retorna `items: []` com `itemCount` e `total` zerados.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Carrinho do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     delete:
       tags: [Cart]
       summary: Limpa o carrinho do usuário
@@ -169,6 +283,55 @@ paths:
                     example: Carrinho limpo
                   cart:
                     $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /cart/items:
+    post:
+      tags: [Cart]
+      summary: Adiciona um produto ao carrinho
+      description: |
+        Adiciona um produto ao carrinho do usuário autenticado. Se o produto
+        já existir no carrinho, soma a quantidade (limite máximo de 99).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId, quantity]
+              properties:
+                productId:
+                  type: integer
+                  minimum: 1
+                  example: 1
+                quantity:
+                  type: integer
+                  minimum: 1
+                  maximum: 99
+                  example: 1
+      responses:
+        '201':
+          description: Item adicionado ao carrinho
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message, cart]
+                properties:
+                  message:
+                    type: string
+                    example: Item adicionado ao carrinho
+                  cart:
+                    $ref: '#/components/schemas/Cart'
+        '400':
+          description: Body inválido (productId ou quantity ausentes/inválidos, ou produto inexistente)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
 
