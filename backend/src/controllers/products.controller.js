@@ -51,10 +51,24 @@ function getBlackFridayProducts(req, res) {
     });
 }
 
+function getRecommendations(req, res) {
+    const raw = typeof req.query.cartItemIds === 'string' ? req.query.cartItemIds : '';
+    const cartItemIds = raw
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map(Number)
+        .filter((n) => Number.isInteger(n) && n > 0);
+
+    const recommendations = productsService.getRecommendations(cartItemIds);
+    res.status(200).json({ recommendations, total: recommendations.length });
+}
+
 module.exports = {
     listProducts,
     getProductById,
     searchProducts,
     getFeaturedProducts,
     getBlackFridayProducts,
+    getRecommendations,
 };
