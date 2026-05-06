@@ -246,6 +246,23 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
   /cart:
+    get:
+      tags: [Cart]
+      summary: Obtém o carrinho do usuário autenticado
+      description: |
+        Retorna os itens do carrinho do usuário, com `itemCount` e `total` calculados.
+        Carrinho vazio retorna `items: []` com `itemCount` e `total` zerados.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Carrinho do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     delete:
       tags: [Cart]
       summary: Limpa o carrinho do usuário
