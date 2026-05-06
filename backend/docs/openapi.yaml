@@ -286,6 +286,55 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /cart/items:
+    post:
+      tags: [Cart]
+      summary: Adiciona um produto ao carrinho
+      description: |
+        Adiciona um produto ao carrinho do usuário autenticado. Se o produto
+        já existir no carrinho, soma a quantidade (limite máximo de 99).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId, quantity]
+              properties:
+                productId:
+                  type: integer
+                  minimum: 1
+                  example: 1
+                quantity:
+                  type: integer
+                  minimum: 1
+                  maximum: 99
+                  example: 1
+      responses:
+        '201':
+          description: Item adicionado ao carrinho
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message, cart]
+                properties:
+                  message:
+                    type: string
+                    example: Item adicionado ao carrinho
+                  cart:
+                    $ref: '#/components/schemas/Cart'
+        '400':
+          description: Body inválido (productId ou quantity ausentes/inválidos, ou produto inexistente)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   /cart/items/{itemId}:
     parameters:
       - in: path
