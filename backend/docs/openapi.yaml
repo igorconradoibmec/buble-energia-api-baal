@@ -122,6 +122,71 @@ paths:
                     type: integer
                     example: 8
 
+  /products/black-friday:
+    get:
+      tags: [Products]
+      summary: Produtos da campanha Black Friday
+      description: |
+        Retorna os produtos selecionados para a campanha Black Friday.
+        Suporta filtros opcionais por categoria, faixa de preço e avaliação mínima.
+      parameters:
+        - in: query
+          name: category
+          required: false
+          schema:
+            type: string
+          example: Conforto
+        - in: query
+          name: priceRange
+          required: false
+          schema:
+            type: string
+            enum: [all, 0-50, 50-100, 100-300, 300-999]
+          example: 300-999
+        - in: query
+          name: minRating
+          required: false
+          schema:
+            type: number
+            minimum: 0
+            maximum: 5
+          example: 4
+      responses:
+        '200':
+          description: Produtos da campanha Black Friday filtrados
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [products, filters, total]
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  filters:
+                    type: object
+                    required: [categories, priceRanges]
+                    properties:
+                      categories:
+                        type: array
+                        items:
+                          type: string
+                      priceRanges:
+                        type: array
+                        items:
+                          type: string
+                          enum: [0-50, 50-100, 100-300, 300-999]
+                  total:
+                    type: integer
+                    example: 4
+        '400':
+          description: priceRange inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /products/{id}:
     get:
       tags: [Products]
