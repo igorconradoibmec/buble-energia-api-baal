@@ -90,10 +90,33 @@ function getBlackFridayProducts({ category, priceRange, minRating } = {}) {
     };
 }
 
+function getRecommendations(cartItemIds, { perCategoryLimit = 10 } = {}) {
+    if (!Array.isArray(cartItemIds) || cartItemIds.length === 0) {
+        return [];
+    }
+
+    const all = loadProducts();
+    const cartIdSet = new Set(cartItemIds);
+    const cartProducts = all.filter((p) => cartIdSet.has(p.id));
+    const cartCategories = new Set(cartProducts.map((p) => p.category).filter(Boolean));
+
+    if (cartCategories.size === 0) return [];
+
+    const recommendations = [];
+    for (const category of cartCategories) {
+        const inCategory = all
+            .filter((p) => p.category === category && !cartIdSet.has(p.id))
+            .slice(0, perCategoryLimit);
+        recommendations.push(...inCategory);
+    }
+    return recommendations;
+}
+
 module.exports = {
     listProducts,
     getProductById,
     searchProducts,
     getFeaturedProducts,
     getBlackFridayProducts,
+    getRecommendations,
 };
