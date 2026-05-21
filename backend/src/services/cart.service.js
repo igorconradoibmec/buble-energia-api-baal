@@ -3,14 +3,14 @@ const productsService = require('./products.service');
 
 const MAX_QUANTITY = 99;
 
-function summarize(items) {
+function summarize(userId, items) {
     const itemCount = items.reduce((sum, it) => sum + it.quantity, 0);
-    const total = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
+    const total = cartRepository.getTotalByUserId(userId);
     return { items, itemCount, total: Number(total.toFixed(2)) };
 }
 
 function getCart(userId) {
-    return summarize(cartRepository.getByUserId(userId));
+    return summarize(userId, cartRepository.getByUserId(userId));
 }
 
 function addItem(userId, productId, quantity) {
@@ -18,11 +18,11 @@ function addItem(userId, productId, quantity) {
     if (!product) return null;
 
     const items = cartRepository.getByUserId(userId);
-    const index = items.findIndex((it) => it.id === productId);
+    const index = items.findIndex((it) => it.productId === productId);
 
     if (index === -1) {
         items.push({
-            id: product.id,
+            productId: product.id,
             name: product.name,
             price: product.price,
             oldPrice: product.oldPrice,
@@ -37,7 +37,7 @@ function addItem(userId, productId, quantity) {
     }
 
     cartRepository.setByUserId(userId, items);
-    return summarize(items);
+    return summarize(userId, cartRepository.getByUserId(userId));
 }
 
 function updateItemQuantity(userId, itemId, quantity) {
@@ -46,7 +46,7 @@ function updateItemQuantity(userId, itemId, quantity) {
     if (index === -1) return null;
     items[index] = { ...items[index], quantity };
     cartRepository.setByUserId(userId, items);
-    return summarize(items);
+    return summarize(userId, cartRepository.getByUserId(userId));
 }
 
 function removeItem(userId, itemId) {
@@ -55,12 +55,12 @@ function removeItem(userId, itemId) {
     if (index === -1) return null;
     items.splice(index, 1);
     cartRepository.setByUserId(userId, items);
-    return summarize(items);
+    return summarize(userId, cartRepository.getByUserId(userId));
 }
 
 function clearCart(userId) {
     cartRepository.setByUserId(userId, []);
-    return summarize([]);
+    return summarize(userId, []);
 }
 
 module.exports = { getCart, addItem, updateItemQuantity, removeItem, clearCart };

@@ -19,3 +19,10 @@ Thumbs.db
 # Build
 dist/
 build/
+
+# SQLite
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.db
