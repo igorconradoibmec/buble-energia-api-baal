@@ -31,6 +31,8 @@ tags:
     description: Validação de cupons de desconto
   - name: Users
     description: Sessão de usuário
+  - name: Auth
+    description: Autenticação via JWT
 
 paths:
   /products:
@@ -418,6 +420,84 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Autentica usuário e retorna JWT
+      description: |
+        Valida email e senha contra os usuários mockados em `src/data/usuarios.js`.
+        Em caso de sucesso, retorna um JWT assinado para uso como
+        `Authorization: Bearer <token>` nas rotas protegidas.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, senha]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@bulbe.com
+                senha:
+                  type: string
+                  format: password
+                  example: admin123
+      responses:
+        '200':
+          description: Login realizado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [token, expiresIn, usuario]
+                properties:
+                  token:
+                    type: string
+                    description: JWT assinado a ser enviado como Bearer token
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  expiresIn:
+                    type: string
+                    example: 1h
+                  usuario:
+                    type: object
+                    required: [id, nome, email, role]
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      nome:
+                        type: string
+                        example: Administrador
+                      email:
+                        type: string
+                        format: email
+                        example: admin@bulbe.com
+                      role:
+                        type: string
+                        example: admin
+        '400':
+          description: Email ou senha não informados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Informe email e senha
+        '401':
+          description: Credenciais inválidas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Credenciais invalidas
 
   /users:
     post:
