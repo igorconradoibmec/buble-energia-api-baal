@@ -1,18 +1,18 @@
-const fs = require('fs');
-const path = require('path');
+const db = require('../db/connection');
 
-const COUPONS_FILE = path.join(__dirname, '..', 'data', 'coupons.json');
-
-function loadAll() {
-    if (!fs.existsSync(COUPONS_FILE)) return [];
-    const raw = fs.readFileSync(COUPONS_FILE, 'utf8');
-    return raw.trim() ? JSON.parse(raw) : [];
-}
+// Cupom valido = existe E (sem validade OU validade ainda nao expirou).
+// A checagem temporal e feita na query (US-22): validade >= data de hoje.
+const FIND_VALID = db.prepare(`
+    SELECT code, discount, type, validade, max_uses, used_count
+    FROM coupons
+    WHERE code = ?
+      AND (validade IS NULL OR validade >= date('now'))
+`);
 
 function findByCode(code) {
     if (!code) return null;
     const normalized = String(code).trim().toUpperCase();
-    return loadAll().find((c) => c.code === normalized) || null;
+    return FIND_VALID.get(normalized) || null;
 }
 
 module.exports = { findByCode };
