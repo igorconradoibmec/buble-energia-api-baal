@@ -13,3 +13,18 @@ CREATE TABLE IF NOT EXISTS coupons (
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Seed inicial importado de src/data/coupons.json (US-22).
+-- INSERT OR IGNORE mantem a migration idempotente: nao duplica se ja existir.
+-- Todos os cupons atuais sao percentuais e sem expiracao (validade NULL).
+INSERT OR IGNORE INTO coupons (code, discount, type) VALUES
+    ('BULBE10', 0.10, 'percentage'),
+    ('BULBE15', 0.15, 'percentage'),
+    ('BULBE20', 0.20, 'percentage'),
+    ('BLACKFRIDAY', 0.20, 'percentage'),
+    ('WELCOME5', 0.05, 'percentage'),
+    ('PROMO25', 0.25, 'percentage'),
+    ('SUPERPROMO', 0.40, 'percentage'),
+    ('SUPER30', 0.30, 'percentage'),
+    ('CLIENTEVIP', 0.12, 'percentage'),
+    ('MEGASALE', 0.18, 'percentage');
