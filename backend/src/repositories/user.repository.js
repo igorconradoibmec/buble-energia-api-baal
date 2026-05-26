@@ -1,22 +1,12 @@
-const fs = require('fs');
-const path = require('path');
+const db = require('../db/connection');
 
-const USERS_FILE = path.join(__dirname, '..', 'data', 'users.json');
-
-function loadAll() {
-    if (!fs.existsSync(USERS_FILE)) return [];
-    const raw = fs.readFileSync(USERS_FILE, 'utf8');
-    return raw.trim() ? JSON.parse(raw) : [];
-}
-
-function saveAll(users) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
+const INSERT_USER = db.prepare(`
+    INSERT OR IGNORE INTO users (id, email, nome, senha_hash, role, created_at)
+    VALUES (@id, null, null, null, 'guest', @created_at)
+`);
 
 function insert(user) {
-    const users = loadAll();
-    users.push(user);
-    saveAll(users);
+    INSERT_USER.run({ id: user.userId, created_at: user.createdAt });
     return user;
 }
 
