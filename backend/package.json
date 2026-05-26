@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "db:migrate": "node src/db/migrate.js"
+    "db:migrate": "node src/db/migrate.js",
+    "db:seed:products": "node src/db/seeds/seed_products.js"
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",
