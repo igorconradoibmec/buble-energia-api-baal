@@ -1,8 +1,3 @@
--- Tabela de produtos (issue #37).
--- Campos espelham products.json com mapeamento snake_case.
--- em_destaque e black_friday sao flags computadas no seed (0/1).
--- Seed separado em src/db/seeds/seed_products.js.
-
 CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,

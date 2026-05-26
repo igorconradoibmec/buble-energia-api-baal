@@ -13,6 +13,9 @@ function hydrate(row) {
         rating: row.rating,
         ratingCount: row.rating_count,
         image: row.image,
+        emDestaque: row.em_destaque === 1,
+        blackFriday: row.black_friday === 1,
+        estoque: row.estoque,
     };
 }
 
@@ -23,9 +26,9 @@ const FIND_BY_CATEGORY = db.prepare(
 );
 const SEARCH = db.prepare(`
     SELECT * FROM products
-    WHERE name LIKE ?
-       OR description LIKE ?
-       OR category LIKE ?
+    WHERE lower(name) LIKE lower(?)
+       OR lower(description) LIKE lower(?)
+       OR lower(category) LIKE lower(?)
 `);
 const FIND_FEATURED = db.prepare('SELECT * FROM products WHERE em_destaque = 1');
 const FIND_NOT_FEATURED = db.prepare('SELECT * FROM products WHERE em_destaque = 0');
@@ -60,27 +63,28 @@ function findBlackFriday() {
     return FIND_BLACK_FRIDAY.all().map(hydrate);
 }
 
-// For each category, fetch up to perCategoryLimit products not in excludeIds.
-// Uses individual prepared statements per category (dynamic exclude list handled in JS).
 function findByCategories(categories, excludeIds, perCategoryLimit) {
     const excludeSet = new Set(excludeIds);
     const results = [];
     for (const category of categories) {
-        const stmt = db.prepare(
-            'SELECT * FROM products WHERE category = ? LIMIT ?'
-        );
-        const rows = stmt.all(category, perCategoryLimit + excludeSet.size);
-        const filtered = rows
+        const rows = FIND_BY_CATEGORY.all(category)
             .filter((r) => !excludeSet.has(r.id))
             .slice(0, perCategoryLimit);
-        results.push(...filtered.map(hydrate));
+        results.push(...rows.map(hydrate));
     }
     return results;
+}
+
+function findByIds(ids) {
+    if (!ids || ids.length === 0) return [];
+    const placeholders = ids.map(() => '?').join(',');
+    return db.prepare(`SELECT * FROM products WHERE id IN (${placeholders})`).all(ids).map(hydrate);
 }
 
 module.exports = {
     findAll,
     findById,
+    findByIds,
     findByCategory,
     search,
     findFeatured,

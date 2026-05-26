@@ -1,7 +1,3 @@
-// Seed: imports products.json into the products table.
-// Safe to run multiple times: INSERT OR IGNORE skips existing rows.
-// Usage: node src/db/seeds/seed_products.js  (from backend dir)
-
 const path = require('path');
 const db = require('../connection');
 const products = require('../../data/products.json');

@@ -73,7 +73,7 @@ function getRecommendations(cartItemIds, { perCategoryLimit = 10 } = {}) {
     }
 
     const cartIdSet = new Set(cartItemIds);
-    const cartProducts = cartItemIds.map((id) => repo.findById(id)).filter(Boolean);
+    const cartProducts = repo.findByIds(cartItemIds);
     const cartCategories = [...new Set(cartProducts.map((p) => p.category).filter(Boolean))];
 
     if (cartCategories.length === 0) return [];
