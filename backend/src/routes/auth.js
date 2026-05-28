@@ -15,11 +15,11 @@ const router = express.Router();
  * @public
  *
  * @param {import('express').Request} req - Requisicao HTTP do Express.
- * @param {string} req.body.email - Email do usuario cadastrado em `usuarios.js`.
- * @param {string} req.body.senha - Senha do usuario cadastrado em `usuarios.js`.
+ * @param {string} req.body.email - Email do usuario cadastrado na tabela `users`.
+ * @param {string} req.body.senha - Senha do usuario (validada contra `senha_hash` via bcrypt).
  * @param {import('express').Response} res - Resposta HTTP do Express.
  *
- * @returns {{ token: string, expiresIn: string, usuario: { id: number, nome: string, email: string, role: string } }}
+ * @returns {{ token: string, expiresIn: string, usuario: { id: string, nome: string, email: string, role: string } }}
  *   Objeto contendo o JWT assinado, o tempo de expiracao e os dados publicos do usuario.
  *
  * @example
