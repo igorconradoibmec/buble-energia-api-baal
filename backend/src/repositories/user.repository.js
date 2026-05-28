@@ -1,4 +1,4 @@
-const db = require('../db/connection');
+const db = require('../db');
 
 const INSERT_USER = db.prepare(`
     INSERT OR IGNORE INTO users (id, email, nome, senha_hash, role, created_at)

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const db = require('./connection');
+const db = require('./index');
 
 const MIGRATIONS_DIR = process.env.MIGRATIONS_DIR
     || path.join(__dirname, 'migrations');
