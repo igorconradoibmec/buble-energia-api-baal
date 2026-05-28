@@ -1,4 +1,4 @@
-const db = require('../db/connection');
+const db = require('../db');
 const productsService = require('../services/products.service');
 
 function getCartIdByUserId(userId) {

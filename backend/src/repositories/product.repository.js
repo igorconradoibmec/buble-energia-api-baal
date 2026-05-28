@@ -1,4 +1,4 @@
-const db = require('../db/connection');
+const db = require('../db');
 
 function hydrate(row) {
     if (!row) return null;

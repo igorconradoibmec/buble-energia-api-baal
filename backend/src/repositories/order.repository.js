@@ -1,4 +1,4 @@
-const db = require('../db/connection');
+const db = require('../db');
 
 const INSERT_ORDER = db.prepare(`
     INSERT INTO orders (

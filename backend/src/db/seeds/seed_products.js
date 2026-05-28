@@ -1,5 +1,5 @@
 const path = require('path');
-const db = require('../connection');
+const db = require('../index');
 const products = require('../../data/products.json');
 
 const BLACK_FRIDAY_IDS = new Set([1, 3, 4, 6]);

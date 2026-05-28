@@ -1,4 +1,4 @@
-const db = require('../db/connection');
+const db = require('../db');
 
 // Cupom valido = existe E (sem validade OU validade ainda nao expirou).
 // A checagem temporal e feita na query (US-22): validade >= data de hoje.
