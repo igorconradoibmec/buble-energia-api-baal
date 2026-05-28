@@ -10,4 +10,14 @@ function insert(user) {
     return user;
 }
 
-module.exports = { insert };
+const FIND_BY_EMAIL = db.prepare(`
+    SELECT id, email, nome, senha_hash, role
+    FROM users
+    WHERE email = ?
+`);
+
+function findByEmail(email) {
+    return FIND_BY_EMAIL.get(email);
+}
+
+module.exports = { insert, findByEmail };
