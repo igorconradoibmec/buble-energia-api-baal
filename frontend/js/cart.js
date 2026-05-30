@@ -1,21 +1,45 @@
-function loadCart() {
-    const cart = CartService.getCart();
+/**
+ * Renderiza e opera o carrinho consumindo /api/v1/cart*.
+ *
+ * IMPORTANTE (id duplo):
+ *   - item.id        -> id da linha em cart_items, usado para PUT/DELETE /cart/items/:id
+ *   - item.productId -> id do produto, usado para o link product-detail.html?id= e recomendacoes
+ */
+
+let currentCart = { items: [], itemCount: 0, total: 0 };
+let lastRecommendationsSignature = '';
+
+async function loadCart() {
     const cartItemsContainer = document.querySelector('.cart-items');
-    
-    if (cart.length === 0) {
+
+    try {
+        currentCart = await CartService.getCart();
+    } catch (error) {
+        console.error('Erro ao carregar carrinho:', error);
+        if (cartItemsContainer) {
+            cartItemsContainer.innerHTML = '<p style="text-align:center;padding:40px;">Erro ao carregar o carrinho.</p>';
+        }
+        return;
+    }
+
+    renderCart();
+}
+
+function renderCart() {
+    const cartItemsContainer = document.querySelector('.cart-items');
+    if (!cartItemsContainer) return;
+
+    const items = currentCart.items || [];
+
+    if (items.length === 0) {
         cartItemsContainer.innerHTML = '<p style="text-align: center; padding: 40px;">Seu carrinho está vazio</p>';
         updateSubtotal();
         renderRecommendations();
         return;
     }
-    
+
     cartItemsContainer.innerHTML = '';
-    
-    cart.forEach(item => {
-        const cartItem = createCartItem(item);
-        cartItemsContainer.appendChild(cartItem);
-    });
-    
+    items.forEach(item => cartItemsContainer.appendChild(createCartItem(item)));
     updateSubtotal();
     renderRecommendations();
 }
@@ -24,27 +48,30 @@ function createCartItem(item) {
     const article = document.createElement('article');
     article.className = 'cart-item';
     article.dataset.id = item.id;
-    
+    article.dataset.productId = item.productId;
+
     article.innerHTML = `
         <div>
             <div class="item-image-container">
                 <img src="${item.image}" alt="${item.name}" class="item-image">
             </div>
-            
+
             <div class="item-details">
-                <h3 class="item-title">${item.name}</h3>
-                
+                <h3 class="item-title">
+                    <a href="product-detail.html?id=${item.productId}" style="color:inherit;text-decoration:none;">${item.name}</a>
+                </h3>
+
                 <div class="item-rating">
                     <img src="images/avaliacao.png" alt="5 estrelas">
                     <span class="rating-count">(${item.ratingCount})</span>
                 </div>
-                
+
                 <div class="item-price-initial">
                     <span class="price-label-de">De</span>
                     <span class="price-value-old" data-old-price-id="${item.id}">R$${(item.oldPrice * item.quantity).toFixed(2)}</span>
                     <span class="price-label-por">por</span>
                 </div>
-                
+
                 <div class="item-price-final">
                     <span class="price-currency">R$</span>
                     <span class="price-value" data-item-id="${item.id}">${(item.price * item.quantity).toFixed(2)}</span>
@@ -59,78 +86,66 @@ function createCartItem(item) {
             <button class="quantity-btn increase" data-id="${item.id}" aria-label="Aumentar quantidade">+</button>
         </div>
     `;
-    
+
     article.querySelector('.decrease').addEventListener('click', () => decreaseQuantity(item.id));
     article.querySelector('.increase').addEventListener('click', () => increaseQuantity(item.id));
     article.querySelector('.quantity-input').addEventListener('change', (e) => updateQuantity(item.id, parseInt(e.target.value)));
-    
+
     return article;
 }
 
-function decreaseQuantity(itemId) {
-    const cart = CartService.getCart();
-    const item = cart.find(i => i.id === itemId);
-    
-    if (item) {
-        if (item.quantity === 1) {
-            removeItem(itemId);
-        } else {
-            CartService.updateItemQuantity(itemId, item.quantity - 1);
-            updateItemPrice(itemId, item.price, item.quantity - 1);
-            updateSubtotal();
-            renderRecommendations();
-        }
-    }
+function findItem(itemId) {
+    return (currentCart.items || []).find(i => i.id === itemId);
 }
 
-function increaseQuantity(itemId) {
-    const cart = CartService.getCart();
-    const item = cart.find(i => i.id === itemId);
-    
-    if (item && item.quantity < 99) {
-        CartService.updateItemQuantity(itemId, item.quantity + 1);
-        updateItemPrice(itemId, item.price, item.quantity + 1);
-        updateSubtotal();
-        renderRecommendations();
-    }
-}
-
-function updateQuantity(itemId, newQuantity) {
-    if (CartService.updateItemQuantity(itemId, newQuantity)) {
-        const cart = CartService.getCart();
-        const item = cart.find(i => i.id === itemId);
-        if (item) {
-            updateItemPrice(itemId, item.price, item.quantity);
-            updateSubtotal();
-            renderRecommendations();
-        }
-    }
-}
-
-function removeItem(itemId) {
-    CartService.removeItem(itemId);
-    loadCart();
-}
-
-function updateItemPrice(itemId, unitPrice, quantity) {
-    const cart = CartService.getCart();
-    const item = cart.find(i => i.id === itemId);
-    
+async function decreaseQuantity(itemId) {
+    const item = findItem(itemId);
     if (!item) return;
-    
-    const priceElement = document.querySelector(`[data-item-id="${itemId}"]`);
-    if (priceElement) {
-        priceElement.textContent = (unitPrice * quantity).toFixed(2);
+
+    try {
+        if (item.quantity <= 1) {
+            currentCart = await CartService.removeItem(itemId);
+            renderCart();
+        } else {
+            currentCart = await CartService.updateItemQuantity(itemId, item.quantity - 1);
+            renderCart();
+        }
+    } catch (error) {
+        alert(error.message || 'Erro ao atualizar quantidade');
     }
-    
-    const oldPriceElement = document.querySelector(`[data-old-price-id="${itemId}"]`);
-    if (oldPriceElement) {
-        oldPriceElement.textContent = `R$${(item.oldPrice * quantity).toFixed(2)}`;
+}
+
+async function increaseQuantity(itemId) {
+    const item = findItem(itemId);
+    if (!item || item.quantity >= 99) return;
+
+    try {
+        currentCart = await CartService.updateItemQuantity(itemId, item.quantity + 1);
+        renderCart();
+    } catch (error) {
+        alert(error.message || 'Erro ao atualizar quantidade');
     }
-    
-    const quantityInput = document.getElementById(`quantity-${itemId}`);
-    if (quantityInput) {
-        quantityInput.value = quantity;
+}
+
+async function updateQuantity(itemId, newQuantity) {
+    if (!Number.isInteger(newQuantity) || newQuantity < 1 || newQuantity > 99) {
+        renderCart();
+        return;
+    }
+    try {
+        currentCart = await CartService.updateItemQuantity(itemId, newQuantity);
+        renderCart();
+    } catch (error) {
+        alert(error.message || 'Erro ao atualizar quantidade');
+    }
+}
+
+async function removeItem(itemId) {
+    try {
+        currentCart = await CartService.removeItem(itemId);
+        renderCart();
+    } catch (error) {
+        alert(error.message || 'Erro ao remover item');
     }
 }
 
@@ -139,7 +154,7 @@ function updateSubtotal() {
     const subtotalValue = document.getElementById('subtotal-value');
     if (!summarySection || !subtotalValue) return;
 
-    const subtotal = CartService.getTotal();
+    const subtotal = Number(currentCart.total) || 0;
 
     if (subtotal <= 0) {
         summarySection.hidden = true;
@@ -149,21 +164,23 @@ function updateSubtotal() {
     }
 }
 
-document.getElementById('checkout-btn').addEventListener('click', () => {
-    const cart = CartService.getCart();
-    if (cart.length > 0) {
-        window.location.href = 'checkout.html';
-    } else {
-        alert('Seu carrinho está vazio!');
-    }
-});
+const checkoutBtn = document.getElementById('checkout-btn');
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', () => {
+        if ((currentCart.items || []).length > 0) {
+            window.location.href = 'checkout.html';
+        } else {
+            alert('Seu carrinho está vazio!');
+        }
+    });
+}
 
 loadCart();
-/* Helpers de recomendações */
-let lastRecommendationsSignature = '';
+
+/* ====== Recomendacoes (US-32 substitui pelo endpoint /products/recommendations) ====== */
 
 function getCartProductIds() {
-    return CartService.getCart().map(item => item.id);
+    return (currentCart.items || []).map(item => item.productId);
 }
 
 function computeRecommendationsSignature(products) {
@@ -194,72 +211,6 @@ function renderCards(target, cards) {
     cards.forEach(card => target.appendChild(card));
 }
 
-function getCartCategories(allProducts) {
-    if (!Array.isArray(allProducts) || allProducts.length === 0) return [];
-    const cartIds = new Set(getCartProductIds());
-    if (cartIds.size === 0) return [];
-    const categoriesSet = new Set();
-    
-    allProducts.forEach(product => {
-        if (!product || product.id == null) return;
-        if (!cartIds.has(product.id)) return;
-        const category = typeof product.category === 'string' ? product.category.trim() : null;
-        if (category) {
-            categoriesSet.add(category);
-        }
-    });
-    
-    return Array.from(categoriesSet);
-}
-
-async function fetchAllProducts() {
-    try {
-        const products = await ProductService.fetchProducts();
-        return Array.isArray(products) ? products : [];
-    } catch (error) {
-        console.error('Erro ao buscar produtos para recomendações:', error);
-        return [];
-    }
-}
-
-function getRecommendedCandidates(allProducts) {
-    if (!Array.isArray(allProducts) || allProducts.length === 0) return [];
-    const cartIds = new Set(getCartProductIds());
-    if (cartIds.size === 0) return [];
-    const categories = new Set(getCartCategories(allProducts));
-    if (categories.size === 0) return [];
-    
-    return allProducts.filter(product => {
-        if (!product || product.id == null) return false;
-        const category = typeof product.category === 'string' ? product.category.trim() : null;
-        const inSameCategory = category && categories.has(category);
-        const notInCart = !cartIds.has(product.id);
-        return inSameCategory && notInCart;
-    });
-}
-
-function limitRecommendationsByCategory(candidates, limitPerCategory = 10) {
-    const uniqueIds = new Set();
-    const categoryCount = new Map();
-    const limited = [];
-    
-    for (const product of candidates) {
-        if (!product || !product.id) continue;
-        const category = typeof product.category === 'string' ? product.category.trim() : null;
-        if (!category) continue;
-        if (uniqueIds.has(product.id)) continue;
-        
-        const count = categoryCount.get(category) || 0;
-        if (count >= limitPerCategory) continue;
-        
-        uniqueIds.add(product.id);
-        categoryCount.set(category, count + 1);
-        limited.push(product);
-    }
-    
-    return limited;
-}
-
 function normalizeProductPrices(product) {
     const normalized = { ...product };
     if (normalized && normalized.price != null && !Number.isNaN(normalized.price)) {
@@ -288,23 +239,39 @@ function buildRecommendationCards(products) {
     });
 }
 
+async function fetchRecommendations(productIds) {
+    if (!Array.isArray(productIds) || productIds.length === 0) return [];
+    try {
+        const data = await Api.get('/products/recommendations', {
+            query: { cartItemIds: productIds.join(',') },
+        });
+        return Array.isArray(data.recommendations) ? data.recommendations : [];
+    } catch (error) {
+        console.error('Erro ao buscar recomendacoes:', error);
+        return [];
+    }
+}
+
 async function renderRecommendations() {
     const section = document.getElementById('cart-recommendations');
     const track = document.getElementById('recommendations-track');
     if (!section || !track) return;
     const skeleton = document.getElementById('recommendations-skeleton');
     const carousel = section.querySelector('.recommendations-carousel');
-    
-    // Mostrar skeleton durante o carregamento
+
+    const productIds = getCartProductIds();
+    if (productIds.length === 0) {
+        hideRecommendations(section, skeleton);
+        lastRecommendationsSignature = '';
+        return;
+    }
+
     showSkeleton(section, skeleton, carousel);
     try {
-        const allProducts = await fetchAllProducts();
-        const candidates = getRecommendedCandidates(allProducts);
-        const limited = limitRecommendationsByCategory(candidates);
-        const cards = buildRecommendationCards(limited);
-        const signature = computeRecommendationsSignature(limited);
-        
-        // Se não mudou, só garante UI e retorna
+        const recommendations = await fetchRecommendations(productIds);
+        const cards = buildRecommendationCards(recommendations);
+        const signature = computeRecommendationsSignature(recommendations);
+
         if (signature === lastRecommendationsSignature) {
             if (cards.length > 0 && carousel) {
                 showCarousel(section, skeleton, carousel);
@@ -315,9 +282,9 @@ async function renderRecommendations() {
             return;
         }
         lastRecommendationsSignature = signature;
-        
+
         renderCards(track, cards);
-        
+
         if (cards.length > 0) {
             showCarousel(section, skeleton, carousel);
             bindRecommendationCarousel();
@@ -326,7 +293,7 @@ async function renderRecommendations() {
             lastRecommendationsSignature = '';
         }
     } catch (error) {
-        console.error('Erro ao renderizar recomendações:', error);
+        console.error('Erro ao renderizar recomendacoes:', error);
         hideRecommendations(section, skeleton);
         lastRecommendationsSignature = '';
     }
@@ -337,21 +304,21 @@ function bindRecommendationCarousel() {
     const prevBtn = document.getElementById('recommendations-prev');
     const nextBtn = document.getElementById('recommendations-next');
     if (!track || !prevBtn || !nextBtn) return;
-    
+
     if (prevBtn.dataset.bound === 'true' && nextBtn.dataset.bound === 'true') {
-        return; // já vinculados
+        return;
     }
-    
+
     const getScrollAmount = () => Math.max(160, Math.floor(track.clientWidth * 0.8));
-    
+
     prevBtn.addEventListener('click', () => {
         track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
     });
-    
+
     nextBtn.addEventListener('click', () => {
         track.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
     });
-    
+
     prevBtn.dataset.bound = 'true';
     nextBtn.dataset.bound = 'true';
 }

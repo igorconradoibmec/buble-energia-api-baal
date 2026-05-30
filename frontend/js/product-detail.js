@@ -2,17 +2,30 @@ let currentProduct = null;
 
 async function loadProductDetail() {
     const productId = parseInt(getURLParam('id'));
-    
-    try {
-        const products = await ProductService.fetchProducts();
-        currentProduct = products.find(p => p.id === productId);
-        
-        if (currentProduct) {
-            displayProduct(currentProduct);
-        }
-    } catch (error) {
-        console.error('Erro ao carregar produto:', error);
+
+    if (!Number.isInteger(productId) || productId <= 0) {
+        showProductNotFound();
+        return;
     }
+
+    currentProduct = await ProductService.fetchProductById(productId);
+
+    if (currentProduct) {
+        displayProduct(currentProduct);
+    } else {
+        showProductNotFound();
+    }
+}
+
+function showProductNotFound() {
+    const title = document.querySelector('.product-title');
+    if (title) title.textContent = 'Produto não encontrado';
+    const description = document.querySelector('.product-description');
+    if (description) description.textContent = 'O produto solicitado não está disponível.';
+    const addBtn = document.getElementById('add-to-cart-btn');
+    const buyBtn = document.getElementById('buy-now-btn');
+    if (addBtn) addBtn.disabled = true;
+    if (buyBtn) buyBtn.disabled = true;
 }
 
 function displayProduct(product) {
@@ -54,17 +67,33 @@ increaseBtn.addEventListener('click', () => {
     }
 });
 
-addToCartBtn.addEventListener('click', () => {
-    if (currentProduct) {
-        CartService.addItem(currentProduct, parseInt(quantityInput.value));
-        alert('Produto adicionado ao carrinho!');
+async function addCurrentToCart() {
+    const quantity = parseInt(quantityInput.value);
+    try {
+        await CartService.addItem(currentProduct.id, quantity);
+        return true;
+    } catch (error) {
+        alert(error.message || 'Erro ao adicionar ao carrinho');
+        return false;
     }
+}
+
+addToCartBtn.addEventListener('click', async () => {
+    if (!currentProduct) return;
+    addToCartBtn.disabled = true;
+    const ok = await addCurrentToCart();
+    addToCartBtn.disabled = false;
+    if (ok) alert('Produto adicionado ao carrinho!');
 });
 
-buyNowBtn.addEventListener('click', () => {
-    if (currentProduct) {
-        CartService.addItem(currentProduct, parseInt(quantityInput.value));
+buyNowBtn.addEventListener('click', async () => {
+    if (!currentProduct) return;
+    buyNowBtn.disabled = true;
+    const ok = await addCurrentToCart();
+    if (ok) {
         window.location.href = 'cart.html';
+    } else {
+        buyNowBtn.disabled = false;
     }
 });
 

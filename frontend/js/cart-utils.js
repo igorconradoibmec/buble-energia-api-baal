@@ -1,68 +1,48 @@
+/**
+ * CartService: integra carrinho com backend (/api/v1/cart*).
+ *
+ * Contrato do backend (cart.repository.hydrate) — cada item tem:
+ *   { id, productId, name, price, oldPrice, image, rating, ratingCount, quantity }
+ *
+ * IMPORTANTE: `id` e' o id da linha em cart_items, usado por PUT/DELETE.
+ * `productId` e' o id do produto, usado para link de detalhe / recomendacoes.
+ *
+ * GET /cart       -> { items, itemCount, total }
+ * POST /cart/items, PUT/DELETE /cart/items/:id, DELETE /cart -> { message, cart }
+ */
 const CartService = {
-    STORAGE_KEY: 'cart',
-    
-    getCart() {
-        return JSON.parse(localStorage.getItem(this.STORAGE_KEY)) || [];
+    async getCart() {
+        return await Api.get('/cart', { auth: true });
     },
-    
-    setCart(cart) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cart));
+
+    async addItem(productId, quantity = 1) {
+        const response = await Api.post(
+            '/cart/items',
+            { productId: Number(productId), quantity: Number(quantity) },
+            { auth: true },
+        );
+        return response.cart;
     },
-    
-    addItem(product, quantity = 1) {
-        const cart = this.getCart();
-        const existingItem = cart.find(item => item.id === product.id);
-        
-        if (existingItem) {
-            existingItem.quantity += quantity;
-        } else {
-            cart.push({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                oldPrice: product.oldPrice,
-                image: product.image,
-                rating: product.rating,
-                ratingCount: product.ratingCount,
-                quantity: quantity
-            });
+
+    async updateItemQuantity(itemId, quantity) {
+        if (quantity < 1 || quantity > 99) {
+            throw new Error('Quantidade invalida (1-99)');
         }
-        
-        this.setCart(cart);
+        const response = await Api.put(
+            `/cart/items/${itemId}`,
+            { quantity: Number(quantity) },
+            { auth: true },
+        );
+        return response.cart;
     },
-    
-    updateItemQuantity(itemId, quantity) {
-        if (quantity < 1 || quantity > 99) return false;
-        
-        const cart = this.getCart();
-        const item = cart.find(i => i.id === itemId);
-        
-        if (item) {
-            item.quantity = quantity;
-            this.setCart(cart);
-            return true;
-        }
-        
-        return false;
+
+    async removeItem(itemId) {
+        const response = await Api.delete(`/cart/items/${itemId}`, { auth: true });
+        return response.cart;
     },
-    
-    removeItem(itemId) {
-        let cart = this.getCart();
-        cart = cart.filter(item => item.id !== itemId);
-        this.setCart(cart);
+
+    async clearCart() {
+        const response = await Api.delete('/cart', { auth: true });
+        return response.cart;
     },
-    
-    clearCart() {
-        localStorage.removeItem(this.STORAGE_KEY);
-    },
-    
-    getTotal() {
-        const cart = this.getCart();
-        return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    },
-    
-    getItemCount() {
-        const cart = this.getCart();
-        return cart.reduce((sum, item) => sum + item.quantity, 0);
-    }
 };

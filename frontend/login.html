@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Bulbe Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <style>
+        .login-container {
+            max-width: 420px;
+            margin: 40px auto;
+            padding: 32px 24px;
+        }
+        .login-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        .login-form .field {
+            margin-bottom: 16px;
+        }
+        .login-form label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        .login-form input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .login-form input:focus {
+            outline: none;
+            border-color: #f7c948;
+        }
+        .login-submit {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            background: #f7c948;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .login-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .login-feedback {
+            margin-top: 16px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            display: none;
+        }
+        .login-feedback.error {
+            display: block;
+            background: #fdecec;
+            color: #b3261e;
+            border: 1px solid #f5c2c0;
+        }
+        .login-feedback.success {
+            display: block;
+            background: #e7f6ec;
+            color: #1b5e20;
+            border: 1px solid #b7e1c0;
+        }
+        .login-hint {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="has-bottom-nav">
+    <header class="site-header">
+        <nav class="navbar-superior">
+            <a href="index.html" class="bulbeshop"><img src="images/header_img/logo.png" alt="Bulbe Shop" class="logo"></a>
+        </nav>
+    </header>
+
+    <main class="login-container">
+        <h1 class="login-title">Entrar</h1>
+        <p class="login-subtitle">Acesse sua conta Bulbe Shop.</p>
+
+        <form id="login-form" class="login-form" novalidate>
+            <div class="field">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" name="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+                <label for="login-senha">Senha</label>
+                <input type="password" id="login-senha" name="senha" autocomplete="current-password" required>
+            </div>
+
+            <button type="submit" class="login-submit" id="login-submit">Entrar</button>
+
+            <div id="login-feedback" class="login-feedback" role="alert"></div>
+        </form>
+
+        <p class="login-hint">Use os usuarios de seed: <code>admin@bulbe.com</code> / <code>admin123</code></p>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
