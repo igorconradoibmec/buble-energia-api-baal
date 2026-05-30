@@ -34,6 +34,40 @@ const FIND_FEATURED = db.prepare('SELECT * FROM products WHERE em_destaque = 1')
 const FIND_NOT_FEATURED = db.prepare('SELECT * FROM products WHERE em_destaque = 0');
 const FIND_BLACK_FRIDAY = db.prepare('SELECT * FROM products WHERE black_friday = 1');
 
+const INSERT = db.prepare(`
+    INSERT INTO products
+        (name, description, category, price, old_price, discount, rating, rating_count, image, em_destaque, black_friday, estoque)
+    VALUES
+        (@name, @description, @category, @price, @old_price, @discount, @rating, @rating_count, @image, @em_destaque, @black_friday, @estoque)
+`);
+const UPDATE = db.prepare(`
+    UPDATE products SET
+        name = @name, description = @description, category = @category, price = @price,
+        old_price = @old_price, discount = @discount, rating = @rating, rating_count = @rating_count,
+        image = @image, em_destaque = @em_destaque, black_friday = @black_friday, estoque = @estoque,
+        updated_at = datetime('now')
+    WHERE id = @id
+`);
+const DELETE = db.prepare('DELETE FROM products WHERE id = ?');
+
+// Converte o objeto da API (camelCase) para as colunas da tabela (snake_case).
+function toRow(data) {
+    return {
+        name: data.name,
+        description: data.description ?? null,
+        category: data.category ?? null,
+        price: data.price,
+        old_price: data.oldPrice ?? null,
+        discount: data.discount ?? null,
+        rating: data.rating ?? null,
+        rating_count: data.ratingCount ?? null,
+        image: data.image ?? null,
+        em_destaque: data.emDestaque ? 1 : 0,
+        black_friday: data.blackFriday ? 1 : 0,
+        estoque: data.estoque ?? 0,
+    };
+}
+
 function findAll() {
     return FIND_ALL.all().map(hydrate);
 }
@@ -81,6 +115,21 @@ function findByIds(ids) {
     return db.prepare(`SELECT * FROM products WHERE id IN (${placeholders})`).all(ids).map(hydrate);
 }
 
+function create(data) {
+    const info = INSERT.run(toRow(data));
+    return findById(info.lastInsertRowid);
+}
+
+function update(id, data) {
+    const result = UPDATE.run({ ...toRow(data), id });
+    if (result.changes === 0) return null;
+    return findById(id);
+}
+
+function remove(id) {
+    return DELETE.run(id).changes > 0;
+}
+
 module.exports = {
     findAll,
     findById,
@@ -91,4 +140,7 @@ module.exports = {
     findNotFeatured,
     findBlackFriday,
     findByCategories,
+    create,
+    update,
+    remove,
 };

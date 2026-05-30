@@ -1,29 +1,26 @@
 async function loadProducts() {
     try {
-        const products = await ProductService.fetchProducts();
-        displaySearchResults(products);
+        const searchQuery = getURLParam('q') || '';
+        const results = await ProductService.search(searchQuery);
+        displaySearchResults(results, searchQuery);
     } catch (error) {
         console.error('Erro ao carregar produtos:', error);
     }
 }
 
-function displaySearchResults(allProducts) {
-    const searchQuery = getURLParam('q') || '';
-    
+function displaySearchResults(results, searchQuery) {
     updateSearchDisplay(searchQuery);
-    
-    const filteredProducts = searchProducts(allProducts, searchQuery);
-    
+
     const productList = document.querySelector('.products-grid');
     if (!productList) return;
     productList.innerHTML = '';
-    
-    if (filteredProducts.length === 0) {
+
+    if (results.length === 0) {
         productList.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #536679;">Nenhum produto encontrado para "' + searchQuery + '"</p>';
         return;
     }
     
-    filteredProducts.forEach(product => {
+    results.forEach(product => {
         const productCard = createProductCard(product);
         productList.appendChild(productCard);
     });

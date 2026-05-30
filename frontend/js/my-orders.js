@@ -1,35 +1,22 @@
 (async function initMyOrders() {
   const container = document.querySelector('.orders-list');
+  if (!container) return;
 
-  const customerId = OrderService.getCurrentUserId();
+  try {
+    // Identidade da sessao (US-27): garante token e pega o customerId.
+    await Api.ensureSession();
+    const customerId = Api.getUserId();
 
-  const JSON_URL = 'orders.json';
+    const data = await Api.get('/customers/' + customerId + '/orders', { auth: true });
+    const myOrders = Array.isArray(data.orders) ? data.orders : [];
 
-  const fetchJsonOrders = async () => {
-    try {
-      const res = await fetch(JSON_URL, { cache: 'no-store' });
-      if (!res.ok) return [];
-      const data = await res.json();
-      return Array.isArray(data) ? data : [];
-    } catch (e) {
-      console.warn('Falha ao carregar orders.json:', e);
-      return [];
-    }
-  };
-
-  const [jsonOrders, localOrders] = await Promise.all([
-    fetchJsonOrders(),
-    Promise.resolve(OrderService.getOrders())
-  ]);
-
-  const mergedMap = new Map();
-  jsonOrders.forEach(o => mergedMap.set(o.id, o));
-  localOrders.forEach(o => mergedMap.set(o.id, o));
-
-  const allOrders = Array.from(mergedMap.values());
-  const myOrders = allOrders.filter(o => o.customerId === customerId);
-
-  renderOrders(myOrders, container);
+    renderOrders(myOrders, container);
+  } catch (error) {
+    console.error('Erro ao carregar pedidos:', error);
+    container.innerHTML = error.status === 401
+      ? `<p style="padding:24px; text-align:center; color:#536679;">Faça login para ver seus pedidos.</p>`
+      : `<p style="padding:24px; text-align:center; color:#536679;">Não foi possível carregar seus pedidos.</p>`;
+  }
 
   function renderOrders(list, containerEl) {
     containerEl.innerHTML = '';
@@ -53,7 +40,7 @@
       el.style.background = '#fff';
 
       const itemsHtml = (order.items || []).map(it => `
-        <li>#${it.id} — ${it.name} <strong>x${it.quantity}</strong>
+        <li>${it.name ? it.name : 'Produto #' + it.id} <strong>x${it.quantity}</strong>
             (R$ ${(Number(it.price) * Number(it.quantity)).toFixed(2)})</li>
       `).join('');
 
