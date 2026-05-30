@@ -1,26 +1,21 @@
 async function loadProducts() {
     try {
-        const products = await ProductService.fetchProducts();
-        displayCategoryProducts(products);
+        const category = getURLParam('category') || '';
+        const products = await ProductService.fetchByCategory(category);
+        displayCategoryProducts(products, category);
     } catch (error) {
         console.error('Erro ao carregar produtos:', error);
     }
 }
 
-function displayCategoryProducts(allProducts) {
-    const category = getURLParam('category') || '';
-    
+function displayCategoryProducts(products, category) {
     updateBreadcrumb(category);
-    
-    const filteredProducts = category 
-        ? allProducts.filter(product => product.category === category)
-        : allProducts;
-    
+
     const productList = document.querySelector('.products-grid');
     if (!productList) return;
     productList.innerHTML = '';
-    
-    filteredProducts.forEach(product => {
+
+    products.forEach(product => {
         const productCard = createProductCard(product);
         productList.appendChild(productCard);
     });
