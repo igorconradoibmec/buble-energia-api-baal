@@ -1,3 +1,7 @@
+// Admin agora consome a API principal (/api/v1/products) em vez do server.js local.
+// O upload de imagem continua no server.js local (a API principal nao tem /upload).
+const ADMIN_API_BASE = 'http://localhost:3001/api/v1';
+
 let products = [];
 let editingId = null;
 
@@ -10,6 +14,38 @@ const previewImg = document.getElementById('preview-img');
 const priceInput = document.getElementById('product-price');
 const oldPriceInput = document.getElementById('product-old-price');
 const discountInput = document.getElementById('product-discount');
+
+function adminToken() {
+    return localStorage.getItem('jwtToken');
+}
+
+function authHeaders(extra = {}) {
+    const headers = { ...extra };
+    const token = adminToken();
+    if (token) {
+        headers['Authorization'] = 'Bearer ' + token;
+    }
+    return headers;
+}
+
+function requireAdminToken() {
+    if (!adminToken()) {
+        alert('Faça login como administrador para gerenciar produtos.');
+        return false;
+    }
+    return true;
+}
+
+async function apiError(response) {
+    let msg = 'HTTP ' + response.status;
+    try {
+        const data = await response.json();
+        if (data && data.error) msg = data.error;
+    } catch (_err) {
+        /* sem corpo JSON */
+    }
+    return new Error(msg);
+}
 
 function calculateDiscount(price, oldPrice) {
     const currentPrice = parseFloat(price);
@@ -28,22 +64,23 @@ function updateDiscountField() {
 
 async function loadProducts() {
     try {
-        const response = await fetch('/api/products');
+        const response = await fetch(`${ADMIN_API_BASE}/products`);
+        if (!response.ok) throw await apiError(response);
         const data = await response.json();
-        products = data.map(product => ({
+        products = (data.products || []).map(product => ({
             ...product,
             discount: calculateDiscount(product.price, product.oldPrice)
         }));
         displayProducts();
     } catch (error) {
         console.error('Erro ao carregar produtos:', error);
-        alert('Erro ao carregar produtos. Certifique-se de que o servidor está rodando.');
+        alert('Erro ao carregar produtos. Verifique se a API esta rodando em ' + ADMIN_API_BASE);
     }
 }
 
 function displayProducts() {
     productsList.innerHTML = '';
-    
+
     products.forEach(product => {
         const discount = calculateDiscount(product.price, product.oldPrice);
         const row = document.createElement('tr');
@@ -69,10 +106,10 @@ let currentImagePath = '';
 function editProduct(id) {
     const product = products.find(p => p.id === id);
     if (!product) return;
-    
+
     editingId = id;
     currentImagePath = product.image;
-    
+
     document.getElementById('product-id').value = product.id;
     document.getElementById('product-name').value = product.name;
     document.getElementById('product-description').value = product.description;
@@ -82,23 +119,32 @@ function editProduct(id) {
     discountInput.value = calculateDiscount(product.price, product.oldPrice);
     document.getElementById('product-rating').value = product.rating;
     document.getElementById('product-rating-count').value = product.ratingCount;
-    
+
     const currentImageEl = document.getElementById('current-image');
     currentImageEl.textContent = `Imagem atual: ${product.image}`;
     currentImageEl.style.display = 'block';
-    
+
     previewImg.src = '../' + product.image;
     imagePreview.style.display = 'block';
-    
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 async function deleteProduct(id) {
     if (!confirm('Tem certeza que deseja excluir este produto?')) return;
-    
-    products = products.filter(p => p.id !== id);
-    await saveProducts();
-    displayProducts();
+    if (!requireAdminToken()) return;
+
+    try {
+        const response = await fetch(`${ADMIN_API_BASE}/products/${id}`, {
+            method: 'DELETE',
+            headers: authHeaders()
+        });
+        if (!response.ok && response.status !== 204) throw await apiError(response);
+        await loadProducts();
+    } catch (error) {
+        console.error('Erro ao excluir produto:', error);
+        alert(error.message || 'Erro ao excluir produto.');
+    }
 }
 
 function clearForm() {
@@ -114,10 +160,12 @@ function clearForm() {
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
+    if (!requireAdminToken()) return;
+
     let imagePath = currentImagePath;
     const imageFile = document.getElementById('product-image').files[0];
-    
+
     if (imageFile) {
         imagePath = await uploadImage(imageFile);
         if (!imagePath) {
@@ -125,19 +173,18 @@ form.addEventListener('submit', async (e) => {
             return;
         }
     }
-    
+
     if (!imagePath && !editingId) {
         alert('Por favor, selecione uma imagem para o produto');
         return;
     }
-    
+
     const price = parseFloat(priceInput.value);
     const oldPrice = parseFloat(oldPriceInput.value);
     const discount = calculateDiscount(price, oldPrice);
     discountInput.value = discount;
-    
+
     const productData = {
-        id: editingId || Date.now(),
         name: document.getElementById('product-name').value,
         description: document.getElementById('product-description').value,
         category: document.getElementById('product-category').value,
@@ -148,19 +195,20 @@ form.addEventListener('submit', async (e) => {
         ratingCount: parseInt(document.getElementById('product-rating-count').value),
         image: imagePath
     };
-    
-    if (editingId) {
-        const index = products.findIndex(p => p.id === editingId);
-        if (index !== -1) {
-            products[index] = productData;
+
+    try {
+        if (editingId) {
+            await saveProduct('PUT', `${ADMIN_API_BASE}/products/${editingId}`, productData);
+        } else {
+            await saveProduct('POST', `${ADMIN_API_BASE}/products`, productData);
         }
-    } else {
-        products.push(productData);
+        alert('Produto salvo com sucesso!');
+        await loadProducts();
+        clearForm();
+    } catch (error) {
+        console.error('Erro ao salvar produto:', error);
+        alert(error.message || 'Erro ao salvar produto.');
     }
-    
-    await saveProducts();
-    displayProducts();
-    clearForm();
 });
 
 cancelBtn.addEventListener('click', clearForm);
@@ -170,15 +218,15 @@ updateDiscountField();
 
 imageInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
-    
+
     if (file) {
         const reader = new FileReader();
-        
+
         reader.onload = (event) => {
             previewImg.src = event.target.result;
             imagePreview.style.display = 'block';
         };
-        
+
         reader.readAsDataURL(file);
     } else {
         imagePreview.style.display = 'none';
@@ -190,46 +238,34 @@ async function uploadImage(file) {
     try {
         const formData = new FormData();
         formData.append('image', file);
-        
+
+        // Upload continua no server.js local do admin (a API principal nao expoe /upload).
         const response = await fetch('/api/upload', {
             method: 'POST',
             body: formData
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             return result.path;
-        } else {
-            return null;
         }
+        return null;
     } catch (error) {
         console.error('Erro ao fazer upload da imagem:', error);
         return null;
     }
 }
 
-async function saveProducts() {
-    try {
-        const response = await fetch('/api/products', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(products)
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            alert('Produtos salvos com sucesso!');
-        } else {
-            alert('Erro ao salvar produtos.');
-        }
-    } catch (error) {
-        console.error('Erro ao salvar produtos:', error);
-        alert('Erro ao salvar produtos. Certifique-se de que o servidor está rodando.');
-    }
+// Cria (POST) ou atualiza (PUT) um produto na API principal, com o JWT de admin.
+async function saveProduct(method, url, body) {
+    const response = await fetch(url, {
+        method,
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(body)
+    });
+    if (!response.ok) throw await apiError(response);
+    return response.status === 204 ? null : response.json();
 }
 
 loadProducts();
