@@ -67,17 +67,33 @@ increaseBtn.addEventListener('click', () => {
     }
 });
 
-addToCartBtn.addEventListener('click', () => {
-    if (currentProduct) {
-        CartService.addItem(currentProduct, parseInt(quantityInput.value));
-        alert('Produto adicionado ao carrinho!');
+async function addCurrentToCart() {
+    const quantity = parseInt(quantityInput.value);
+    try {
+        await CartService.addItem(currentProduct.id, quantity);
+        return true;
+    } catch (error) {
+        alert(error.message || 'Erro ao adicionar ao carrinho');
+        return false;
     }
+}
+
+addToCartBtn.addEventListener('click', async () => {
+    if (!currentProduct) return;
+    addToCartBtn.disabled = true;
+    const ok = await addCurrentToCart();
+    addToCartBtn.disabled = false;
+    if (ok) alert('Produto adicionado ao carrinho!');
 });
 
-buyNowBtn.addEventListener('click', () => {
-    if (currentProduct) {
-        CartService.addItem(currentProduct, parseInt(quantityInput.value));
+buyNowBtn.addEventListener('click', async () => {
+    if (!currentProduct) return;
+    buyNowBtn.disabled = true;
+    const ok = await addCurrentToCart();
+    if (ok) {
         window.location.href = 'cart.html';
+    } else {
+        buyNowBtn.disabled = false;
     }
 });
 
