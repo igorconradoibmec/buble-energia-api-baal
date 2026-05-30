@@ -1,4 +1,3 @@
-const BLACK_FRIDAY_ECHO_IDS = [1, 3, 4, 6];
 let blackFridayProducts = [];
 const blackFridayFilters = {
     categories: [],
@@ -12,20 +11,41 @@ async function loadBlackFridayProducts() {
         if (categoryParam) {
             blackFridayFilters.categories = [categoryParam];
         }
+        await fetchAndRenderBlackFriday();
+    } catch (error) {
+        console.error('Erro ao carregar produtos da Black Friday:', error);
+    }
+}
 
-        const products = await ProductService.fetchProducts();
-        const echoDotDeals = products.filter(isBlackFridayEchoProduct);
-        
-        blackFridayProducts = echoDotDeals.length
-            ? echoDotDeals
-            : (typeof getAlexaProducts === 'function'
-                ? getAlexaProducts(products)
-                : products.filter(product => isAlexaProduct(product)));
+async function fetchAndRenderBlackFriday() {
+    // O endpoint aceita uma unica categoria; com mais de uma selecionada,
+    // omitimos a categoria no servidor e aplicamos o subconjunto no cliente.
+    const serverCategory = blackFridayFilters.categories.length === 1
+        ? blackFridayFilters.categories[0]
+        : undefined;
+    const priceRange = blackFridayFilters.priceRange && blackFridayFilters.priceRange !== 'all'
+        ? blackFridayFilters.priceRange
+        : undefined;
 
-        renderCategoryFilters(blackFridayProducts, blackFridayFilters.categories);
+    try {
+        const data = await Api.get('/products/black-friday', {
+            query: {
+                category: serverCategory,
+                priceRange,
+                minRating: blackFridayFilters.rating || undefined
+            }
+        });
+
+        blackFridayProducts = Array.isArray(data.products) ? data.products : [];
+        renderCategoryFilters(data.filters?.categories || [], blackFridayFilters.categories);
         renderBlackFridayProducts();
         updateBlackFridayBreadcrumb();
     } catch (error) {
+        if (error.status === 400) {
+            // priceRange invalido: mantem a lista atual sem quebrar a tela.
+            console.warn('Filtro invalido na Black Friday:', error.message);
+            return;
+        }
         console.error('Erro ao carregar produtos da Black Friday:', error);
     }
 }
@@ -34,60 +54,33 @@ function renderBlackFridayProducts() {
     const container = document.querySelector('.products-grid');
     if (!container) return;
 
-    const filteredProducts = applyBlackFridayFilters();
+    let list = blackFridayProducts;
+    // Quando ha multiplas categorias, o servidor nao filtra por elas; aplica aqui.
+    if (blackFridayFilters.categories.length > 1) {
+        list = list.filter(product => blackFridayFilters.categories.includes(product.category));
+    }
 
-    if (!filteredProducts.length) {
+    if (!list.length) {
         container.innerHTML = '<p class="no-products">Nenhum produto encontrado para os filtros selecionados.</p>';
         return;
     }
 
     container.innerHTML = '';
 
-    filteredProducts.forEach(product => {
+    list.forEach(product => {
         const productCard = createProductCard(product);
         productCard.classList.add('product-card--black-friday');
         container.appendChild(productCard);
     });
 }
 
-function applyBlackFridayFilters() {
-    return blackFridayProducts.filter(product => {
-        if (blackFridayFilters.categories.length && !blackFridayFilters.categories.includes(product.category)) {
-            return false;
-        }
-
-        if (!isWithinPriceRange(product.price, blackFridayFilters.priceRange)) {
-            return false;
-        }
-
-        if (blackFridayFilters.rating && product.rating < blackFridayFilters.rating) {
-            return false;
-        }
-
-        return true;
-    });
-}
-
-function isWithinPriceRange(price, range) {
-    if (!range || range === 'all') return true;
-    
-    const [min, max] = range.split('-').map(Number);
-    if (Number.isNaN(min)) return true;
-    
-    if (range === '300-999') {
-        return price >= min;
-    }
-    
-    return price >= min && price <= max;
-}
-
-function renderCategoryFilters(products, activeCategories = []) {
+function renderCategoryFilters(categories = [], activeCategories = []) {
     const container = document.getElementById('dynamic-category-list');
     if (!container) return;
 
-    const categories = [...new Set(products.map(product => product.category))].sort();
+    const sorted = [...categories].sort();
 
-    container.innerHTML = categories.map(category => `
+    container.innerHTML = sorted.map(category => `
         <label class="filter-option">
             <input type="checkbox" name="category" value="${category}" ${activeCategories.includes(category) ? 'checked' : ''}>
             ${category}
@@ -104,19 +97,10 @@ function updateBlackFridayBreadcrumb() {
         : 'Todos os descontos';
 }
 
-function isBlackFridayEchoProduct(product) {
-    if (!product) return false;
-    if (product.id && BLACK_FRIDAY_ECHO_IDS.includes(product.id)) {
-        return true;
-    }
-    const name = (product.name || '').toLowerCase();
-    return name.includes('echo dot');
-}
-
 document.addEventListener('filters:apply', (event) => {
     const filters = event.detail?.filters || {};
     const categoryFilter = filters.category;
-    
+
     if (Array.isArray(categoryFilter)) {
         blackFridayFilters.categories = categoryFilter;
     } else if (typeof categoryFilter === 'string') {
@@ -128,8 +112,8 @@ document.addEventListener('filters:apply', (event) => {
     blackFridayFilters.priceRange = filters['price-range'] || 'all';
     blackFridayFilters.rating = filters.rating ? Number(filters.rating) : null;
 
-    renderBlackFridayProducts();
-    updateBlackFridayBreadcrumb();
+    // Refaz a chamada ao servidor com os filtros selecionados.
+    fetchAndRenderBlackFriday();
 });
 
 loadBlackFridayProducts();
