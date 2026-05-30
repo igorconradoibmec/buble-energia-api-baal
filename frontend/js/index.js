@@ -1,41 +1,24 @@
 async function loadFeaturedProducts() {
+    const productGrid = document.querySelector('.product-grid-horizontal');
+    if (!productGrid) return;
+
     try {
-        const products = await ProductService.fetchProducts();
-        const productGrid = document.querySelector('.product-grid-horizontal');
-        if (!productGrid) return;
-        
-        const alexaProducts = typeof getAlexaProducts === 'function'
-            ? getAlexaProducts(products)
-            : products.filter(isAlexaProduct);
-        
-        const featuredList = [];
-        
-        // Garantir até 2 Alexas
-        alexaProducts.slice(0, 2).forEach(product => featuredList.push(product));
-        
-        // Preencher o restante com produtos aleatórios distintos
-        const remainingProducts = products.filter(product => !featuredList.includes(product));
-        shuffleArray(remainingProducts);
-        
-        remainingProducts.slice(0, Math.max(0, 8 - featuredList.length)).forEach(product => {
-            featuredList.push(product);
-        });
-        
+        const data = await Api.get('/products/featured');
+        const products = Array.isArray(data.products) ? data.products : [];
+
         productGrid.innerHTML = '';
-        
-        featuredList.slice(0, 8).forEach(product => {
-            const productCard = createProductCard(product);
-            productGrid.appendChild(productCard);
+
+        if (products.length === 0) {
+            productGrid.innerHTML = '<p style="text-align:center;padding:20px;">Sem destaques no momento.</p>';
+            return;
+        }
+
+        products.forEach(product => {
+            productGrid.appendChild(createProductCard(product));
         });
     } catch (error) {
-        console.error('Erro ao carregar produtos:', error);
-    }
-}
-
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+        console.error('Erro ao carregar destaques:', error);
+        productGrid.innerHTML = '<p style="text-align:center;padding:20px;">Erro ao carregar destaques.</p>';
     }
 }
 
