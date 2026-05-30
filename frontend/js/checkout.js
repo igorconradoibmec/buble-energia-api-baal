@@ -145,7 +145,21 @@ function validateForm() {
         alert('CEP de entrega inválido');
         return false;
     }
-    
+
+    const billingEmail = document.getElementById('billing-email');
+    if (billingEmail && billingEmail.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingEmail.value.trim())) {
+        alert('E-mail inválido');
+        return false;
+    }
+
+    const ufFields = [document.getElementById('billing-uf'), document.getElementById('delivery-uf')];
+    for (const uf of ufFields) {
+        if (uf && uf.value && !/^[A-Za-z]{2}$/.test(uf.value.trim())) {
+            alert('Estado (UF) inválido — use 2 letras, ex: MG');
+            return false;
+        }
+    }
+
     if (!isValid) {
         alert('Por favor, preencha todos os campos obrigatórios');
     }
