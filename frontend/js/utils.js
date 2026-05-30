@@ -5,14 +5,24 @@ const ProductService = {
     
     async fetchProducts() {
         if (this.cache) return this.cache;
-        
+
         try {
-            const response = await fetch('products.json');
-            this.cache = await response.json();
+            const data = await Api.get('/products');
+            this.cache = Array.isArray(data.products) ? data.products : [];
             return this.cache;
         } catch (error) {
             console.error('Erro ao carregar produtos:', error);
             return [];
+        }
+    },
+
+    async fetchProductById(id) {
+        try {
+            return await Api.get(`/products/${id}`);
+        } catch (error) {
+            if (error.status === 404) return null;
+            console.error('Erro ao carregar produto:', error);
+            return null;
         }
     },
     

@@ -2,17 +2,30 @@ let currentProduct = null;
 
 async function loadProductDetail() {
     const productId = parseInt(getURLParam('id'));
-    
-    try {
-        const products = await ProductService.fetchProducts();
-        currentProduct = products.find(p => p.id === productId);
-        
-        if (currentProduct) {
-            displayProduct(currentProduct);
-        }
-    } catch (error) {
-        console.error('Erro ao carregar produto:', error);
+
+    if (!Number.isInteger(productId) || productId <= 0) {
+        showProductNotFound();
+        return;
     }
+
+    currentProduct = await ProductService.fetchProductById(productId);
+
+    if (currentProduct) {
+        displayProduct(currentProduct);
+    } else {
+        showProductNotFound();
+    }
+}
+
+function showProductNotFound() {
+    const title = document.querySelector('.product-title');
+    if (title) title.textContent = 'Produto não encontrado';
+    const description = document.querySelector('.product-description');
+    if (description) description.textContent = 'O produto solicitado não está disponível.';
+    const addBtn = document.getElementById('add-to-cart-btn');
+    const buyBtn = document.getElementById('buy-now-btn');
+    if (addBtn) addBtn.disabled = true;
+    if (buyBtn) buyBtn.disabled = true;
 }
 
 function displayProduct(product) {
