@@ -38,13 +38,30 @@ const Api = (function () {
         localStorage.removeItem(USER_KEY);
     }
 
-    function ensureSession() {
-        let token = getToken();
-        if (!token) {
-            token = 'guest-' + Math.random().toString(36).slice(2, 8).toUpperCase();
-            setSession(token, token);
-        }
-        return token;
+    let _sessionPromise = null;
+
+    async function ensureSession() {
+        const existing = getToken();
+        if (existing) return existing;
+        if (_sessionPromise) return _sessionPromise;
+
+        _sessionPromise = (async () => {
+            try {
+                const response = await fetch(BASE_URL + '/users', {
+                    method: 'POST',
+                    headers: { Accept: 'application/json' },
+                });
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                const data = await response.json();
+                setSession(data.token, data.userId);
+                return data.token;
+            } catch (err) {
+                _sessionPromise = null;
+                throw err;
+            }
+        })();
+
+        return _sessionPromise;
     }
 
     function buildQuery(params) {
@@ -62,7 +79,7 @@ const Api = (function () {
         const url = BASE_URL + path + buildQuery(opts.query);
         const headers = { Accept: 'application/json' };
         if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
-        if (opts.auth) headers['Authorization'] = `Bearer ${ensureSession()}`;
+        if (opts.auth) headers['Authorization'] = `Bearer ${await ensureSession()}`;
 
         const response = await fetch(url, {
             method,
