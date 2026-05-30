@@ -8,11 +8,10 @@
  * BASE_URL pode ser sobrescrita antes do load via:
  *   window.__BULBE_API_BASE_URL__ = 'http://x.y/api/v1'
  *
- * Sessao (stub guest): enquanto a US-27 (POST /users) nao estiver implementada,
- * `ensureSession()` gera um id local `guest-XXXX` e o salva como `authToken`.
+ * Sessao guest (US-27): `ensureSession()` chama `POST /users` quando nao ha
+ * token salvo e persiste `token`/`userId` no localStorage (`authToken`/`userId`).
  * O middleware do backend trata qualquer Bearer nao vazio como `userId`, logo
- * o stub e' compativel com o contrato — a US-27 vai substituir essa geracao
- * por uma chamada `POST /users`.
+ * o token guest serve de portador de identidade para carrinho e pedidos.
  */
 const Api = (function () {
     const BASE_URL = window.__BULBE_API_BASE_URL__ || 'http://localhost:3001/api/v1';

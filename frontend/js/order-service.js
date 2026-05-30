@@ -4,13 +4,20 @@ const OrderService = {
   USER_KEY: 'userId',
 
   getCurrentUserId() {
-    let id = localStorage.getItem(this.USER_KEY);
-    if (!id) {
-      // Gera um identificador
-      id = 'guest-' + Math.random().toString(36).slice(2, 8);
-      localStorage.setItem(this.USER_KEY, id);
-    }
-    return id;
+    // A identidade agora vem da sessao do Api client (POST /users em ensureSession).
+    // Mantem fallback ao localStorage caso o api.js ainda nao tenha carregado.
+    if (typeof Api !== 'undefined') return Api.getUserId();
+    return localStorage.getItem(this.USER_KEY);
+  },
+
+  // Garante uma sessao guest no backend (POST /users) e devolve o token.
+  ensureSession() {
+    return Api.ensureSession();
+  },
+
+  // Limpa a sessao atual (logout): remove token/userId salvos.
+  logout() {
+    if (typeof Api !== 'undefined') Api.clearSession();
   },
 
   _readAll() {
