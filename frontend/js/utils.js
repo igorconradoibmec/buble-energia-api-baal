@@ -27,6 +27,17 @@ const ProductService = {
         }
     },
 
+    async search(q) {
+        // Busca textual feita no servidor via GET /products/search?q=
+        try {
+            const data = await Api.get('/products/search', { query: { q } });
+            return Array.isArray(data.results) ? data.results : [];
+        } catch (error) {
+            console.error('Erro ao buscar produtos:', error);
+            return [];
+        }
+    },
+
     async fetchProductById(id) {
         try {
             return await Api.get(`/products/${id}`);
