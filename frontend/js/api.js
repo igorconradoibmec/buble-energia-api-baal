@@ -113,3 +113,16 @@ const Api = (function () {
         },
     };
 })();
+
+// US-38: icone "perfil" do header aponta para login.html
+document.addEventListener('DOMContentLoaded', () => {
+    const profileBtns = document.querySelectorAll('.profile-photo, #profileBtn');
+    profileBtns.forEach((btn) => {
+        if (btn.dataset.bulbeProfileBound === 'true') return;
+        btn.style.cursor = 'pointer';
+        btn.addEventListener('click', () => {
+            window.location.href = 'login.html';
+        });
+        btn.dataset.bulbeProfileBound = 'true';
+    });
+});
