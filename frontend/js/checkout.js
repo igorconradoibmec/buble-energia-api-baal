@@ -49,7 +49,7 @@ function initPaymentMethodToggle() {
     toggleFields(initialMethod);
 }
 
-function handleSubmit(event) {
+async function handleSubmit(event) {
     event.preventDefault();
 
     if (!checkoutForm) {
@@ -72,30 +72,98 @@ function handleSubmit(event) {
         return;
     }
 
-    const order = OrderService.createOrder({
-        paymentMethod: paymentSelection.value,
-        shipping: SHIPPING_COST,
-        pixDiscount: PIX_DISCOUNT
-    });
+    const submitBtn = document.getElementById('submit-order-btn');
+    if (submitBtn) submitBtn.disabled = true;
 
-    if (!order) {
-        alert('Seu carrinho está vazio.');
-        return;
+    try {
+        const payload = await buildOrderPayload(paymentSelection.value);
+
+        if (!payload) {
+            alert('Seu carrinho está vazio.');
+            return;
+        }
+
+        // O servidor cria o pedido e calcula subtotal/descontos/finalAmount.
+        await OrderService.createOrder(payload);
+        await CartService.clearCart();
+        window.location.href = 'confirmation.html';
+    } catch (error) {
+        console.error('Erro ao finalizar o pedido:', error);
+        if (error.status === 401) {
+            alert('Sua sessão expirou. Atualize a página e tente novamente.');
+        } else {
+            alert(error.message || 'Não foi possível finalizar o pedido.');
+        }
+    } finally {
+        if (submitBtn) submitBtn.disabled = false;
     }
-
-    CartService.clearCart();
-    window.location.href = 'confirmation.html';
 }
 
-function loadCheckoutItems() {
+// Monta o payload de POST /orders a partir do formulario, do carrinho e do cupom.
+async function buildOrderPayload(paymentMethod) {
+    const cart = await CartService.getCart();
+    const items = (cart.items || []).map((it) => ({
+        id: it.productId, // contrato: items[].id e' o productId (nao o id da linha do carrinho)
+        quantity: it.quantity,
+        price: it.price,
+    }));
+
+    if (!items.length) {
+        return null;
+    }
+
+    const val = (id) => (document.getElementById(id)?.value || '').trim();
+
+    const payload = {
+        items,
+        paymentMethod,
+        shipping: SHIPPING_COST,
+        customer: {
+            name: val('billing-name'),
+            email: val('billing-email'),
+        },
+        billingAddress: {
+            zip: val('billing-cep'),
+            street: val('billing-address'),
+            number: val('billing-number'),
+            city: val('billing-city'),
+            state: val('billing-uf').toUpperCase(),
+            complement: val('billing-complement'),
+            phone: val('billing-phone'),
+        },
+        deliveryAddress: {
+            name: val('delivery-name'),
+            zip: val('delivery-cep'),
+            street: val('delivery-address'),
+            number: val('delivery-number'),
+            city: val('delivery-city'),
+            state: val('delivery-uf').toUpperCase(),
+            phone: val('delivery-phone'),
+            notes: val('delivery-notes'),
+        },
+    };
+
+    // Cupom aplicado (US-34) — so enviar se existir, senao o backend devolve 400.
+    const couponCode = localStorage.getItem('cupomCodigo');
+    if (couponCode) {
+        payload.couponCode = couponCode;
+    }
+
+    return payload;
+}
+
+async function loadCheckoutItems() {
     if (typeof CartService === 'undefined') {
         return;
     }
 
-    const cart = CartService.getCart();
-
-    if (!cart || cart.length === 0) {
-        window.location.href = 'cart.html';
+    try {
+        const cart = await CartService.getCart();
+        if (!cart || !Array.isArray(cart.items) || cart.items.length === 0) {
+            window.location.href = 'cart.html';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar o carrinho:', error);
     }
 }
 
