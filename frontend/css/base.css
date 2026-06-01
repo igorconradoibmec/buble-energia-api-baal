@@ -1,32 +1,127 @@
-* {
+/* ============================================================
+   Bulbe Shop — base / design system
+   Tokens, app-frame, header, navegacao, botoes e componentes
+   compartilhados. Mobile-first, fluido de 320px ao desktop.
+   ============================================================ */
+
+:root {
+    /* Marca */
+    --brand: #08068D;
+    --brand-700: #070577;
+    --brand-600: #1410A8;
+    --brand-500: #2A27C0;
+    --brand-secondary: #0762C7;
+    --brand-secondary-600: #0653A8;
+
+    /* Texto */
+    --text-strong: #29333D;
+    --text: #3E4D5B;
+    --text-muted: #536679;
+    --text-faint: #8A98A8;
+    --line: #E5E8F0;
+
+    /* Superficies */
+    --surface: #FFFFFF;
+    --surface-2: #F4F5FB;
+    --surface-3: #F8F8FF;
+
+    /* Status */
+    --success-bg: #E9FBF2;
+    --success-fg: #18814D;
+    --danger-bg: #FEE4E2;
+    --danger-fg: #B42318;
+    --gold: #FFD74A;
+
+    /* Raios */
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 22px;
+    --radius-pill: 999px;
+
+    /* Sombras (suaves, em camadas) */
+    --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.06);
+    --shadow-sm: 0 2px 6px rgba(16, 24, 40, 0.07), 0 1px 2px rgba(16, 24, 40, 0.04);
+    --shadow-soft: 0 6px 18px rgba(8, 6, 141, 0.08), 0 2px 6px rgba(16, 24, 40, 0.05);
+    --shadow-md: 0 10px 26px rgba(8, 6, 141, 0.10), 0 3px 8px rgba(16, 24, 40, 0.06);
+    --shadow-lg: 0 24px 50px rgba(8, 6, 141, 0.18), 0 8px 18px rgba(16, 24, 40, 0.08);
+
+    --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Largura do "app". Antes era 393px fixo; agora vira token. */
+    --app-width: 440px;
+}
+
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+html {
+    min-height: 100%;
+    /* Fundo ambiente: aparece nas laterais quando a tela e' maior que o app */
+    background:
+        radial-gradient(900px 520px at 15% -10%, rgba(7, 98, 199, 0.12), transparent 60%),
+        radial-gradient(820px 520px at 92% 0%, rgba(8, 6, 141, 0.12), transparent 55%),
+        linear-gradient(180deg, #EEF1FB 0%, #E7EBF7 100%);
+    background-attachment: fixed;
+}
+
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #08068D;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--brand);
+    color: var(--text);
     width: 100%;
-    max-width: 393px;
+    max-width: var(--app-width);
     margin: 0 auto;
     min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
+
+/* Em telas maiores o app vira um cartao centralizado sobre o fundo ambiente */
+@media (min-width: 480px) {
+    body {
+        box-shadow: var(--shadow-lg);
+    }
+}
+
+img {
+    max-width: 100%;
+}
+
+a {
+    color: inherit;
+}
+
+:focus-visible {
+    outline: 2px solid var(--brand-secondary);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* ===================== Header ===================== */
 
 .site-header {
     width: 100%;
-    max-width: 393px;
-    height: 117px;
-    background: #08068D;
+    max-width: var(--app-width);
+    min-height: 117px;
+    background:
+        radial-gradient(120% 140% at 0% 0%, #0B09A6 0%, var(--brand) 52%, var(--brand-700) 100%);
     position: relative;
+    z-index: 10;
 }
 
 .navbar-superior {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    padding: 0 1px;
-    gap: 45px;
+    padding: 0 18px;
+    gap: 14px;
     width: 100%;
     height: 70px;
 }
@@ -35,14 +130,20 @@ body {
 .back-btn {
     width: 28px;
     height: 28px;
-    font-family: 'Font Awesome 5 Pro';
-    font-weight: 300;
     font-size: 24px;
     line-height: 120%;
     color: #FFFFFF;
     background: none;
     border: none;
     cursor: pointer;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+    transition: opacity var(--transition);
+}
+
+.menu-btn:hover,
+.back-btn:hover {
+    opacity: 0.8;
 }
 
 .menu-btn img,
@@ -52,85 +153,117 @@ body {
     object-fit: contain;
 }
 
-.bulbeshop{
-    width: 160px;
+.bulbeshop {
+    display: inline-flex;
+    align-items: center;
     height: 28px;
+    margin: 0 auto;
 }
 
 .logo {
     width: 160px;
     height: 28px;
+    object-fit: contain;
 }
 
 .profile-photo {
-    width: 28px;
-    height: 28px;
-    background: url('../images/profile.jpg');
-    border: 2px solid #FFFFFF;
-    border-radius: 200px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 4px 0 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.profile-photo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
 }
 
 .search-bar {
     display: flex;
-    align-items: flex-start;
-    padding: 8px 12px;
+    align-items: center;
+    padding: 9px 14px;
     gap: 12px;
-    width: 374px;
-    height: 37px;
-    background: #FFFFFF;
-    border: 0.5px solid #A4B3C1;
-    border-radius: 20px;
-    margin: 0 auto;
+    height: 40px;
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: var(--radius-pill);
     position: absolute;
-    left: 9px;
-    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition);
+}
+
+.search-bar:focus-within {
+    box-shadow: 0 0 0 3px rgba(7, 98, 199, 0.18), var(--shadow-sm);
 }
 
 .search-bar input {
+    flex: 1;
     width: 100%;
-    height: 18px;
-    font-family: 'Poppins';
-    font-weight: 300;
+    height: 20px;
+    font-family: inherit;
+    font-weight: 400;
     font-size: 13px;
     line-height: 140%;
-    color: #A4B3C1;
+    color: var(--text);
     border: none;
     outline: none;
+    background: transparent;
+}
+
+.search-bar input::placeholder {
+    color: var(--text-faint);
 }
 
 .search-icon {
-    width: 21px;
-    height: 21px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    opacity: 0.85;
 }
+
+/* ===================== Conteudo ===================== */
 
 .container {
     width: 100%;
-    max-width: 393px;
-    background: #F8F8FF;
-    border-radius: 20px 20px 0 0;
-    padding: 12px 20px 35px;
-    min-height: calc(100vh - 146px);
+    max-width: var(--app-width);
+    background: var(--surface-3);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: 16px 20px 35px;
+    min-height: calc(100vh - 117px);
+    position: relative;
 }
 
 .has-bottom-nav .container {
-    padding-bottom: 40px;
+    padding-bottom: 96px;
 }
+
+/* ===================== Bottom nav ===================== */
 
 .bottom-nav {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 0 20px;
-    gap: 21px;
+    justify-content: space-around;
+    align-items: stretch;
+    padding: 0 16px;
+    gap: 8px;
     width: 100%;
-    max-width: 393px;
-    height: 80px;
-    background: #FFFFFF;
-    box-shadow: -2px -2px 8px rgba(0, 0, 0, 0.1);
+    max-width: var(--app-width);
+    height: 76px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: saturate(160%) blur(12px);
+    -webkit-backdrop-filter: saturate(160%) blur(12px);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -6px 20px rgba(8, 6, 141, 0.08);
     position: fixed;
     bottom: 0;
     left: 50%;
@@ -143,54 +276,30 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 8px 0;
-    gap: 4px;
-    width: 96px;
-    height: 80px;
+    padding: 10px 0;
+    gap: 5px;
+    flex: 1;
     text-decoration: none;
+    border-radius: var(--radius);
+    transition: background var(--transition);
+}
+
+.nav-item:hover {
+    background: var(--surface-2);
 }
 
 .nav-icon {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
+    transition: transform var(--transition);
+}
+
+.nav-item.active .nav-icon {
+    transform: translateY(-1px);
 }
 
 .nav-icon.active-icon {
     display: none;
-}
-
-.product-card--alexa {
-    background: linear-gradient(180deg, #FFFBE6 0%, #FFFFFF 100%);
-    border: 1px solid rgba(255, 215, 0, 0.4);
-    box-shadow: 0 8px 18px rgba(10, 10, 10, 0.15);
-    position: relative;
-}
-
-.product-card--alexa::before {
-    content: 'Black Friday';
-    position: absolute;
-    top: -10px;
-    left: 12px;
-    background: #111111;
-    color: #FFD74A;
-    font-family: 'Poppins';
-    font-weight: 600;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    padding: 3px 10px;
-    border-radius: 999px;
-    text-transform: uppercase;
-}
-
-.product-card--alexa .discount-tag {
-    background: #111111;
-    color: #FFD74A;
-    box-shadow: 0 4px 12px rgba(17, 17, 17, 0.2);
-}
-
-.product-card--alexa .price-currency,
-.product-card--alexa .price-value {
-    color: #1C1C1C;
 }
 
 .nav-icon.inactive-icon {
@@ -206,52 +315,120 @@ body {
 }
 
 .nav-label {
-    font-family: 'Poppins';
+    font-family: inherit;
     font-weight: 500;
     font-size: 12px;
-    line-height: 18px;
+    line-height: 16px;
     text-align: center;
-    color: #C2CCD6;
+    color: var(--text-faint);
+    transition: color var(--transition);
 }
 
 .nav-item.active .nav-label {
-    color: #08068D;
+    color: var(--brand);
+    font-weight: 600;
 }
 
+/* ===================== Cartao destaque (Alexa / BF) ===================== */
+
+.product-card--alexa {
+    background: linear-gradient(180deg, #FFFBE6 0%, #FFFFFF 100%);
+    border: 1px solid rgba(255, 215, 0, 0.45);
+    box-shadow: var(--shadow-md);
+    position: relative;
+}
+
+.product-card--alexa::before {
+    content: 'Black Friday';
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: #111111;
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    text-transform: uppercase;
+    box-shadow: var(--shadow-sm);
+}
+
+.product-card--alexa .discount-tag {
+    background: #111111;
+    color: var(--gold);
+    box-shadow: 0 4px 12px rgba(17, 17, 17, 0.2);
+}
+
+.product-card--alexa .price-currency,
+.product-card--alexa .price-value {
+    color: #1C1C1C;
+}
+
+/* ===================== Botoes ===================== */
+
 .btn {
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-    padding: 3px 16px;
-    gap: 10px;
-    border-radius: 6px;
-    font-family: 'Poppins';
+    padding: 12px 18px;
+    gap: 8px;
+    border-radius: var(--radius);
+    font-family: inherit;
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
     cursor: pointer;
     border: none;
+    text-decoration: none;
+    transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+}
+
+.btn:active {
+    transform: translateY(1px);
 }
 
 .btn-primary {
-    background: #08068D;
+    background: linear-gradient(135deg, var(--brand) 0%, #1B18B8 100%);
     color: #FFFFFF;
+    box-shadow: var(--shadow-soft);
+}
+
+.btn-primary:hover {
+    filter: brightness(1.08);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-secondary {
-    background: #0762C7;
+    background: linear-gradient(135deg, var(--brand-secondary) 0%, #0A77E0 100%);
     color: #FFFFFF;
+    box-shadow: var(--shadow-soft);
 }
 
+.btn-secondary:hover {
+    filter: brightness(1.08);
+    box-shadow: var(--shadow-md);
+}
+
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+    filter: none;
+}
+
+/* ===================== Sidebar (menu sanduiche) ===================== */
+
 .sidebar-menu {
-    position: absolute;
+    position: fixed;
     top: 0;
-    left: 0;
-    width: 280px;
+    left: 50%;
+    margin-left: calc(var(--app-width) / -2);
+    width: min(280px, 82%);
     height: 100vh;
-    background-color: #070577;
+    background: linear-gradient(180deg, var(--brand-700) 0%, #050455 100%);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 6px 0 20px rgba(0, 0, 0, 0.25);
+    box-shadow: 12px 0 36px rgba(0, 0, 0, 0.3);
     transform: translateX(-100%);
     opacity: 0;
     visibility: hidden;
@@ -260,7 +437,7 @@ body {
     z-index: 2000;
     display: flex;
     flex-direction: column;
-    padding: 24px 20px;
+    padding: 26px 20px;
 }
 
 .top-sidebar-menu {
@@ -278,28 +455,28 @@ body {
 }
 
 .menu-links {
-    margin-top: 40px;
+    margin-top: 36px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .menu-link-item {
     display: block;
-    padding: 12px 14px;
-    border-radius: 12px;
+    padding: 13px 15px;
+    border-radius: var(--radius);
     text-decoration: none;
     font-size: 1rem;
     font-weight: 500;
     color: #FFFFFF;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: background var(--transition), transform var(--transition);
 }
 
 .menu-link-item:hover {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateX(2px);
+    background: rgba(255, 255, 255, 0.14);
+    transform: translateX(3px);
 }
 
 .menu-bottom-actions {
@@ -314,22 +491,23 @@ body {
     align-items: center;
     justify-content: center;
     padding: 12px 0;
-    border-radius: 12px;
+    border-radius: var(--radius);
     font-weight: 600;
     font-size: 0.95rem;
     text-decoration: none;
     border: none;
     cursor: pointer;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--transition), transform var(--transition);
 }
 
 .menu-cta:hover {
-    opacity: 0.85;
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 .contact-link {
     background: #FFFFFF;
-    color: #070577;
+    color: var(--brand-700);
 }
 
 .settings-btn {
@@ -365,6 +543,8 @@ body {
     pointer-events: auto;
 }
 
+/* ===================== Filtro (modal) ===================== */
+
 .filter-modal-overlay {
     position: fixed;
     inset: 0;
@@ -389,11 +569,11 @@ body {
     bottom: 0;
     transform: translate(-50%, 100%);
     width: 100%;
-    max-width: 393px;
-    background: #FFFFFF;
-    border-radius: 24px 24px 0 0;
-    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.2);
-    padding: 20px 20px 28px;
+    max-width: var(--app-width);
+    background: var(--surface);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: 0 -12px 32px rgba(8, 6, 141, 0.22);
+    padding: 22px 20px 28px;
     z-index: 1500;
     transition: transform 0.3s ease;
 }
@@ -411,26 +591,38 @@ body {
 
 .filter-modal__title {
     font-size: 1.2rem;
-    color: #08068D;
+    color: var(--brand);
 }
 
 .filter-modal__close {
-    background: none;
+    background: var(--surface-2);
     border: none;
-    font-size: 1.8rem;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-pill);
+    font-size: 1.5rem;
     line-height: 1;
     cursor: pointer;
-    color: #08068D;
+    color: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition);
+}
+
+.filter-modal__close:hover {
+    background: #E6E9F5;
 }
 
 .filter-modal__section {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .filter-modal__section-title {
     font-size: 0.95rem;
-    color: #536679;
-    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 10px;
 }
 
 .filter-options {
@@ -443,23 +635,39 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 12px;
-    border-radius: 12px;
-    background: #F4F5FB;
+    padding: 9px 13px;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    border: 1px solid transparent;
     font-size: 0.9rem;
     color: #0A0A33;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition);
+}
+
+.filter-option:hover {
+    background: #ECEFFA;
+}
+
+.filter-option:has(input:checked) {
+    background: #E6F1FE;
+    border-color: var(--brand-secondary);
+}
+
+.filter-option input {
+    accent-color: var(--brand);
 }
 
 .filter-modal__actions {
     display: flex;
     gap: 12px;
-    margin-top: 12px;
+    margin-top: 16px;
 }
 
 .filter-modal__actions .btn-primary,
 .filter-modal__actions .btn-secondary {
     flex: 1;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     padding: 14px 0;
     font-size: 1rem;
 }
@@ -468,42 +676,86 @@ body.filter-modal-open {
     overflow: hidden;
 }
 
-.product-card .product-image {
-    width: 100%;
-    height: 160px;
-    border-radius: 12px;
-    background: #F4F5FB;
-    object-fit: contain;
-    padding: 8px;
-    display: block;
-    margin-bottom: 8px;
+.filter-clear-btn {
+    background: rgba(8, 6, 141, 0.07);
+    color: var(--brand);
+    border: 1px solid rgba(8, 6, 141, 0.15);
+    box-shadow: none;
 }
 
-.filter-clear-btn {
-    background: rgba(8, 6, 141, 0.08);
-    color: #08068D;
-    border: 1px solid rgba(8, 6, 141, 0.15);
+.filter-clear-btn:hover {
+    background: rgba(8, 6, 141, 0.12);
+    filter: none;
 }
 
 .filter-apply-btn {
-    background: #08068D;
+    background: linear-gradient(135deg, var(--brand) 0%, #1B18B8 100%);
     color: #FFFFFF;
     border: none;
 }
 
+/* ===================== Cartao de produto (base unificada) ===================== */
+
+.product-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.product-card .product-image {
+    width: 100%;
+    height: 160px;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    object-fit: contain;
+    padding: 10px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Preco do card escala com a largura para nunca estourar a coluna estreita */
+.product-card .price-value {
+    font-size: clamp(22px, 6.4vw, 34px);
+}
+
+/* ===================== Tipografia utilitaria ===================== */
+
 .page-title {
-    font-family: 'Poppins';
-    font-weight: 500;
+    font-family: inherit;
+    font-weight: 600;
     font-size: 23px;
-    line-height: 140%;
-    color: #08068D;
+    line-height: 132%;
+    letter-spacing: -0.01em;
+    color: var(--brand);
 }
 
 .section-title {
-    font-family: 'Poppins';
-    font-weight: 400;
+    font-family: inherit;
+    font-weight: 600;
     font-size: 14px;
     line-height: 20px;
-    color: #536679;
-    margin-bottom: 10px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    letter-spacing: 0.01em;
+}
+
+/* ===================== Responsivo: tablet / desktop ===================== */
+/* A partir de ~600px o "app" ganha largura e as grades de produto passam a
+   3 colunas, aproveitando melhor a tela sem perder a identidade mobile. */
+@media (min-width: 600px) {
+    :root {
+        --app-width: 600px;
+    }
+
+    .container .products-grid,
+    .container .product-grid-horizontal {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }

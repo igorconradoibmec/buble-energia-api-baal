@@ -20,15 +20,23 @@
 
 .filter-btn {
     background: #E6F1FE;
-    border-radius: 12px;
-    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    padding: 8px 16px;
     font-family: 'Poppins';
     font-weight: 600;
     font-size: 13px;
     line-height: 20px;
-    color: #08068D;
-    border: none;
+    color: var(--brand);
+    border: 1px solid rgba(8, 6, 141, 0.08);
     cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background var(--transition), transform var(--transition);
+}
+
+.filter-btn:hover {
+    background: #D9E8FD;
+    transform: translateY(-1px);
 }
 
 .products-grid {
@@ -39,10 +47,7 @@
 }
 
 .product-card {
-    background: #FFFFFF;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 12px;
-    padding: 8px;
+    padding: 12px;
     position: relative;
     display: flex;
     flex-direction: column;

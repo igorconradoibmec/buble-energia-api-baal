@@ -9,18 +9,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <style>
+        body {
+            background: var(--surface-3);
+        }
         .login-container {
-            max-width: 420px;
-            margin: 40px auto;
-            padding: 32px 24px;
+            max-width: min(400px, calc(100% - 32px));
+            margin: 32px auto;
+            padding: 34px 26px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
         }
         .login-title {
             font-size: 24px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            color: var(--brand);
         }
         .login-subtitle {
-            color: #666;
+            color: var(--text-muted);
             margin-bottom: 24px;
             font-size: 14px;
         }
@@ -30,39 +38,49 @@
         .login-form label {
             display: block;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 6px;
-            color: #333;
+            color: var(--text);
         }
         .login-form input {
             width: 100%;
             padding: 12px 14px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
             font-family: 'Poppins', sans-serif;
             font-size: 14px;
             box-sizing: border-box;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
         }
         .login-form input:focus {
             outline: none;
-            border-color: #f7c948;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(8, 6, 141, 0.12);
         }
         .login-submit {
             width: 100%;
             padding: 14px;
             margin-top: 8px;
-            background: #f7c948;
-            color: #1a1a1a;
+            background: linear-gradient(135deg, var(--brand) 0%, #1B18B8 100%);
+            color: #FFFFFF;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius);
             font-family: 'Poppins', sans-serif;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
+            box-shadow: var(--shadow-soft);
+            transition: filter 0.18s ease, box-shadow 0.18s ease;
+        }
+        .login-submit:hover {
+            filter: brightness(1.08);
+            box-shadow: var(--shadow-md);
         }
         .login-submit:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            box-shadow: none;
+            filter: none;
         }
         .login-feedback {
             margin-top: 16px;
@@ -73,21 +91,27 @@
         }
         .login-feedback.error {
             display: block;
-            background: #fdecec;
-            color: #b3261e;
+            background: var(--danger-bg);
+            color: var(--danger-fg);
             border: 1px solid #f5c2c0;
         }
         .login-feedback.success {
             display: block;
-            background: #e7f6ec;
-            color: #1b5e20;
+            background: var(--success-bg);
+            color: var(--success-fg);
             border: 1px solid #b7e1c0;
         }
         .login-hint {
-            margin-top: 12px;
+            margin-top: 14px;
             font-size: 12px;
-            color: #888;
+            color: var(--text-faint);
             text-align: center;
+        }
+        .login-hint code {
+            background: var(--surface-2);
+            padding: 2px 6px;
+            border-radius: 6px;
+            color: var(--brand);
         }
     </style>
 </head>
