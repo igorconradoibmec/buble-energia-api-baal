@@ -44,7 +44,25 @@ A Bulbe Energia API é o backend do sistema de monitoramento e comercialização
 
 ## ⚙️ Como Executar Localmente
 
-> *A ser preenchido na Sprint 2.*
+> Pré-requisitos: Node.js 18+ e npm.
+
+```bash
+cd backend
+npm install
+
+npm run db:migrate          # cria o schema SQLite
+npm run db:seed:products    # popula o catálogo
+npm run db:seed:users       # popula usuários de teste
+
+npm start                   # API principal     -> http://localhost:3001
+npm run start:blackfriday   # API Black Friday  -> http://localhost:3002
+```
+
+A campanha de **Black Friday roda como serviço isolado, numa porta própria**
+(`BLACK_FRIDAY_PORT`, padrão `3002`), separada da API principal (`PORT`, padrão
+`3001`). É o padrão *bulkhead*: o pico de tráfego da campanha fica contido no
+seu próprio processo e não derruba o catálogo, o carrinho nem o checkout da loja.
+Cada serviço sobe de forma independente; para a loja completa, rode os dois.
 
 ---
 

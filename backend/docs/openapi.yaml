@@ -125,11 +125,20 @@ paths:
                     example: 8
 
   /products/black-friday:
+    servers:
+      - url: http://localhost:3002/api/v1
+        description: Serviço isolado da Black Friday (porta dedicada)
     get:
       tags: [Products]
       summary: Produtos da campanha Black Friday
       description: |
         Retorna os produtos selecionados para a campanha Black Friday.
+
+        Esta rota roda num serviço isolado, em porta própria (`BLACK_FRIDAY_PORT`,
+        padrão `3002`), separado da API principal (`PORT`, padrão `3001`). O pico
+        de tráfego da campanha fica contido no seu próprio processo e não derruba
+        o catálogo, o carrinho nem o checkout (padrão *bulkhead*).
+
         Suporta filtros opcionais por categoria, faixa de preço e avaliação mínima.
       parameters:
         - in: query
