@@ -6,7 +6,6 @@ const swaggerUi = require('swagger-ui-express');
 const yaml = require('js-yaml');
 
 const productsRoutes = require('./routes/products.routes');
-const blackFridayRoutes = require('./routes/blackFriday.routes');
 const cartRoutes = require('./routes/cart.routes');
 const orderRoutes = require('./routes/order.routes');
 const customerRoutes = require('./routes/customer.routes');
@@ -25,8 +24,8 @@ const openapiSpec = yaml.load(
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
 app.get('/openapi.json', (_req, res) => res.json(openapiSpec));
 
-// Rota mais especifica antes de /products/:id para nao cair no getProductById.
-app.use('/api/v1/products/black-friday', blackFridayRoutes);
+// A black-friday foi isolada num app/porta proprios (ver blackFridayApp.js);
+// o app principal nao serve mais essa rota.
 app.use('/api/v1/products', productsRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/orders', orderRoutes);
