@@ -24,6 +24,8 @@ const openapiSpec = yaml.load(
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
 app.get('/openapi.json', (_req, res) => res.json(openapiSpec));
 
+// A black-friday foi isolada num app/porta proprios (ver blackFridayApp.js);
+// o app principal nao serve mais essa rota.
 app.use('/api/v1/products', productsRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/orders', orderRoutes);

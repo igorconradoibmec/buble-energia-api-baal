@@ -8,6 +8,10 @@
  * BASE_URL pode ser sobrescrita antes do load via:
  *   window.__BULBE_API_BASE_URL__ = 'http://x.y/api/v1'
  *
+ * A black-friday roda num servico isolado, em porta dedicada. Sua base e a
+ * BLACK_FRIDAY_BASE_URL (sobrescrivivel via window.__BULBE_BF_API_BASE_URL__);
+ * passe `{ baseUrl: Api.BLACK_FRIDAY_BASE_URL }` na chamada para mira-la.
+ *
  * Sessao guest (US-27): `ensureSession()` chama `POST /users` quando nao ha
  * token salvo e persiste `token`/`userId` no localStorage (`authToken`/`userId`).
  * O middleware do backend trata qualquer Bearer nao vazio como `userId`, logo
@@ -15,6 +19,8 @@
  */
 const Api = (function () {
     const BASE_URL = window.__BULBE_API_BASE_URL__ || 'http://localhost:3001/api/v1';
+    // Servico isolado da Black Friday (bulkhead): porta propria, base propria.
+    const BLACK_FRIDAY_BASE_URL = window.__BULBE_BF_API_BASE_URL__ || 'http://localhost:3002/api/v1';
 
     const TOKEN_KEY = 'authToken';
     const USER_KEY = 'userId';
@@ -75,7 +81,8 @@ const Api = (function () {
 
     async function request(method, path, options) {
         const opts = options || {};
-        const url = BASE_URL + path + buildQuery(opts.query);
+        const base = opts.baseUrl || BASE_URL;
+        const url = base + path + buildQuery(opts.query);
         const headers = { Accept: 'application/json' };
         if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
         if (opts.auth) headers['Authorization'] = `Bearer ${await ensureSession()}`;
@@ -109,6 +116,7 @@ const Api = (function () {
 
     return {
         BASE_URL,
+        BLACK_FRIDAY_BASE_URL,
         getToken,
         setSession,
         getUserId,
