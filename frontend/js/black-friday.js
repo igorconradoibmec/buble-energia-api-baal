@@ -29,6 +29,7 @@ async function fetchAndRenderBlackFriday() {
 
     try {
         const data = await Api.get('/products/black-friday', {
+            baseUrl: Api.BLACK_FRIDAY_BASE_URL,
             query: {
                 category: serverCategory,
                 priceRange,
