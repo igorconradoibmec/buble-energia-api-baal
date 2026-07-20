@@ -18,9 +18,9 @@
  * o token guest serve de portador de identidade para carrinho e pedidos.
  */
 const Api = (function () {
-    const BASE_URL = window.__BULBE_API_BASE_URL__ || 'http://localhost:3001/api/v1';
+    const BASE_URL = window.__BULBE_API_BASE_URL__ || '/api/v1';
     // Servico isolado da Black Friday (bulkhead): porta propria, base propria.
-    const BLACK_FRIDAY_BASE_URL = window.__BULBE_BF_API_BASE_URL__ || 'http://localhost:3002/api/v1';
+    const BLACK_FRIDAY_BASE_URL = window.__BULBE_BF_API_BASE_URL__ || '/bf/api/v1';
 
     const TOKEN_KEY = 'authToken';
     const USER_KEY = 'userId';

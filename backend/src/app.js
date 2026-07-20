@@ -34,4 +34,30 @@ app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/auth', authRoutes);
 
+// Proxy da Black Friday: encaminha /bf/* para o processo isolado (bulkhead)
+// rodando na porta dedicada, mantendo o front na mesma origem (sem CORS).
+const BLACK_FRIDAY_PORT = process.env.BLACK_FRIDAY_PORT || 3002;
+app.use('/bf', async (req, res) => {
+    const upstreamPath = req.originalUrl.replace(/^\/bf/, '') || '/';
+    const target = `http://127.0.0.1:${BLACK_FRIDAY_PORT}${upstreamPath}`;
+    try {
+        const upstream = await fetch(target, {
+            method: req.method,
+            headers: { Accept: req.headers.accept || 'application/json' },
+        });
+        const body = await upstream.text();
+        res.status(upstream.status);
+        res.set('Content-Type', upstream.headers.get('content-type') || 'application/json');
+        res.send(body);
+    } catch (err) {
+        res.status(502).json({ error: 'Black Friday indisponivel' });
+    }
+});
+
+// Serve o frontend estático (mesma origem da API em producao)
+const frontendPath = path.join(__dirname, '..', '..', 'frontend');
+// Entrada do site abre pela tela de login.
+app.get('/', (_req, res) => res.sendFile(path.join(frontendPath, 'login.html')));
+app.use(express.static(frontendPath));
+
 module.exports = app;

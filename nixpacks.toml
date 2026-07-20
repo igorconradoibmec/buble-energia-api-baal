@@ -1,0 +1,9 @@
+# Deploy Railway: monorepo (backend Express + frontend estatico servido junto)
+[phases.setup]
+nixPkgs = ['nodejs_20', 'python3', 'gcc', 'gnumake']
+
+[phases.install]
+cmds = ['cd backend && npm install']
+
+[start]
+cmd = 'cd backend && npm run start:prod'

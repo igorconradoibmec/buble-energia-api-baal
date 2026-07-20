@@ -5,8 +5,10 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "start:prod": "node src/db/migrate.js && node src/db/seeds/seed_products.js && node src/db/seeds/seed_users.js && node src/server.js",
     "dev": "node --watch src/server.js",
     "start:blackfriday": "node src/blackFridayServer.js",
+    "start:prod:all": "node src/db/migrate.js && node src/db/seeds/seed_products.js && node src/db/seeds/seed_users.js && node src/startAll.js",
     "dev:blackfriday": "node --watch src/blackFridayServer.js",
     "db:migrate": "node src/db/migrate.js",
     "db:seed:products": "node src/db/seeds/seed_products.js",

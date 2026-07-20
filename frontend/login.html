@@ -113,6 +113,30 @@
             border-radius: 6px;
             color: var(--brand);
         }
+        /* Logo centralizada na faixa do header. Horizontal pela nav
+           (justify-content). Vertical pelo proprio header: a faixa tem 117px mas
+           a nav so 70px e ficava colada no topo, sobrando 47px vazios embaixo e
+           dando o efeito de "logo alta demais". align-items:center desce a nav
+           pro centro vertical da faixa. */
+        .site-header {
+            display: flex;
+            align-items: center;
+        }
+        .site-header .navbar-superior {
+            justify-content: center;
+        }
+        .login-guest {
+            display: block;
+            margin: 18px auto 0;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--brand);
+            text-decoration: none;
+        }
+        .login-guest:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body class="has-bottom-nav">
@@ -142,6 +166,8 @@
         </form>
 
         <p class="login-hint">Use os usuarios de seed: <code>admin@bulbe.com</code> / <code>admin123</code></p>
+
+        <a href="index.html" class="login-guest">Continuar como visitante</a>
     </main>
 
     <script src="js/api.js"></script>

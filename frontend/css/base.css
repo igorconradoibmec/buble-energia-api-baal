@@ -422,10 +422,9 @@ a {
 .sidebar-menu {
     position: fixed;
     top: 0;
-    left: 50%;
-    margin-left: calc(var(--app-width) / -2);
+    bottom: 0;
+    left: max(0px, calc(50% - var(--app-width) / 2));
     width: min(280px, 82%);
-    height: 100vh;
     background: linear-gradient(180deg, var(--brand-700) 0%, #050455 100%);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 12px 0 36px rgba(0, 0, 0, 0.3);
@@ -437,7 +436,9 @@ a {
     z-index: 2000;
     display: flex;
     flex-direction: column;
-    padding: 26px 20px;
+    padding: 26px 20px calc(26px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .top-sidebar-menu {
@@ -528,6 +529,7 @@ a {
     inset: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background: rgba(8, 6, 141, 0.35);
     backdrop-filter: blur(6px);
     opacity: 0;
